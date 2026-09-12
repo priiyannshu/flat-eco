@@ -6,11 +6,14 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
-  Plus,
+  Check,
   Minus,
+  Plus,
   Lock,
   Sun,
-  Moon
+  Moon,
+  UtensilsCrossed,
+  Calendar
 } from 'lucide-react';
 
 const TIFFIN_PRICE = 60;
@@ -18,19 +21,25 @@ const LOCK_HOURS = 24;
 
 export const TiffinsPage: React.FC = () => {
   const { currentUser, allUsers } = useAuth();
+  const isOwner = currentUser?.role === 'owner';
 
+  // Selected month for viewing (YYYY-MM)
+  const currentMonthInitial = new Date().toISOString().substring(0, 7);
+  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthInitial);
+
+  // Date selection for owner counter
   const todayStr = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [selectedMeal, setSelectedMeal] = useState<MealType>('lunch');
+
   const [records, setRecords] = useState<TiffinRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const currentMonthStr = selectedDate.substring(0, 7);
-
+  // Fetch all records for the selected month
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const data = await api.getTiffins(currentMonthStr);
+      const data = await api.getTiffins(selectedMonth);
       setRecords(data);
     } catch (err) {
       console.error('Failed to load tiffins:', err);
@@ -41,8 +50,49 @@ export const TiffinsPage: React.FC = () => {
 
   useEffect(() => {
     fetchRecords();
-  }, [currentMonthStr]);
+  }, [selectedMonth]);
 
+  // Month navigation
+  const changeMonth = (delta: number) => {
+    const [y, m] = selectedMonth.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    setSelectedMonth(d.toISOString().substring(0, 7));
+  };
+
+  // --- TENANT VIEW COMPUTATIONS ---
+  const tKey = (currentUser?.id || 'tenant_1') as 'tenant_1' | 'tenant_2' | 'tenant_3' | 'tenant_4';
+
+  const tenantMonthStats = useMemo(() => {
+    let count = 0;
+    for (const r of records) {
+      count += (r[tKey] || 0);
+    }
+    return {
+      count,
+      amount: count * TIFFIN_PRICE
+    };
+  }, [records, tKey]);
+
+  // Days list for tenant table (descending order from today or month end)
+  const daysInMonth = useMemo(() => {
+    const [yearStr, monthStr] = selectedMonth.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10);
+
+    const totalDaysInMonth = new Date(year, month, 0).getDate();
+    const today = new Date();
+    const isCurrentMonth = today.getFullYear() === year && (today.getMonth() + 1) === month;
+    const maxDay = isCurrentMonth ? today.getDate() : totalDaysInMonth;
+
+    const days: string[] = [];
+    for (let d = maxDay; d >= 1; d--) {
+      const dayStr = String(d).padStart(2, '0');
+      days.push(`${yearStr}-${monthStr}-${dayStr}`);
+    }
+    return days;
+  }, [selectedMonth]);
+
+  // --- OWNER COUNTER COMPUTATIONS & HANDLERS ---
   const recordId = `${selectedDate}_${selectedMeal}`;
   const currentRecord = useMemo(() => {
     return records.find((r) => r.id === recordId) || {
@@ -60,7 +110,6 @@ export const TiffinsPage: React.FC = () => {
     };
   }, [records, recordId, selectedDate, selectedMeal]);
 
-  // 24-Hour lock check
   const isLocked = useMemo(() => {
     const existing = records.find((r) => r.id === recordId);
     if (!existing) return false;
@@ -80,7 +129,11 @@ export const TiffinsPage: React.FC = () => {
   const changeDate = (days: number) => {
     const d = new Date(selectedDate);
     d.setDate(d.getDate() + days);
-    setSelectedDate(d.toISOString().split('T')[0]);
+    const newDateStr = d.toISOString().split('T')[0];
+    setSelectedDate(newDateStr);
+    if (newDateStr.substring(0, 7) !== selectedMonth) {
+      setSelectedMonth(newDateStr.substring(0, 7));
+    }
   };
 
   const updateRecord = async (updates: Partial<TiffinRecord>) => {
@@ -132,8 +185,162 @@ export const TiffinsPage: React.FC = () => {
     (currentRecord.tenant_4 || 0) +
     (currentRecord.extras || 0);
 
+  // ==========================================
+  // 1. TENANT VIEW: TABLE OF MARKED TIFFINS
+  // ==========================================
+  if (!isOwner) {
+    const monthTitle = new Date(selectedMonth + '-01').toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    });
+
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* Header & Month Selector */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Tiffins</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Your daily meal log</p>
+          </div>
+
+          <div className="flex items-center space-x-1.5 bg-white px-2 py-1 rounded-xl border border-slate-200">
+            <button
+              onClick={() => changeMonth(-1)}
+              className="p-1 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+              title="Previous Month"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs font-bold text-slate-800 px-1">{monthTitle}</span>
+            <button
+              onClick={() => changeMonth(1)}
+              className="p-1 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+              title="Next Month"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Month Summary Card for Tenant */}
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm mb-5 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              Meals Taken ({monthTitle})
+            </span>
+            <span className="text-2xl font-black text-brand-700 block mt-0.5">
+              {tenantMonthStats.count} <span className="text-xs font-medium text-slate-400">tiffins</span>
+            </span>
+          </div>
+          <div className="text-right">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              Total Cost
+            </span>
+            <span className="text-2xl font-black text-slate-900 block mt-0.5">
+              ₹{tenantMonthStats.amount}
+            </span>
+            <span className="text-[10px] text-slate-400 block font-medium">₹{TIFFIN_PRICE} / meal</span>
+          </div>
+        </div>
+
+        {/* Tiffin Records Table */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider">
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-3">Lunch</th>
+                  <th className="py-3 px-3">Dinner</th>
+                  <th className="py-3 px-4 text-right">Daily</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {daysInMonth.map((dateStr) => {
+                  const lunchRec = records.find((r) => r.date === dateStr && r.meal_type === 'lunch');
+                  const dinnerRec = records.find((r) => r.date === dateStr && r.meal_type === 'dinner');
+
+                  const isLunchMarked = lunchRec ? lunchRec[tKey] === 1 : false;
+                  const isDinnerMarked = dinnerRec ? dinnerRec[tKey] === 1 : false;
+                  const dayMeals = (isLunchMarked ? 1 : 0) + (isDinnerMarked ? 1 : 0);
+
+                  const dateFormatted = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short',
+                    weekday: 'short'
+                  });
+
+                  return (
+                    <tr key={dateStr} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="py-3 px-4 font-bold text-slate-800">
+                        {dateFormatted}
+                      </td>
+
+                      {/* Lunch Column */}
+                      <td className="py-3 px-3">
+                        {isLunchMarked ? (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                            <span>Marked</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 bg-slate-100">
+                            Not Marked
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Dinner Column */}
+                      <td className="py-3 px-3">
+                        {isDinnerMarked ? (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                            <span>Marked</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 bg-slate-100">
+                            Not Marked
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Daily Total Column */}
+                      <td className="py-3 px-4 text-right">
+                        {dayMeals > 0 ? (
+                          <span className="font-extrabold text-slate-900">
+                            {dayMeals} <span className="text-[10px] text-slate-500 font-medium">(₹{dayMeals * TIFFIN_PRICE})</span>
+                          </span>
+                        ) : (
+                          <span className="text-slate-300 font-medium">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 2. OWNER VIEW: MEAL TICKING BOARD
+  // ==========================================
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-xl font-extrabold text-slate-900">Tiffin Counter</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Mark daily meals for flatmates</p>
+        </div>
+        <span className="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-xl border border-brand-200">
+          ₹{TIFFIN_PRICE} / meal
+        </span>
+      </div>
+
       {/* Date & Meal Slot Control */}
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-5">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -150,7 +357,12 @@ export const TiffinsPage: React.FC = () => {
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                if (e.target.value.substring(0, 7) !== selectedMonth) {
+                  setSelectedMonth(e.target.value.substring(0, 7));
+                }
+              }}
               className="font-bold text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             />
 
@@ -163,7 +375,10 @@ export const TiffinsPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setSelectedDate(todayStr)}
+              onClick={() => {
+                setSelectedDate(todayStr);
+                setSelectedMonth(todayStr.substring(0, 7));
+              }}
               className={`px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
                 selectedDate === todayStr
                   ? 'bg-brand-600 text-white shadow-sm'
@@ -215,7 +430,7 @@ export const TiffinsPage: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-sm font-bold text-slate-800">4 Roommates</h2>
-            <p className="text-xs text-slate-400">₹{TIFFIN_PRICE} per meal</p>
+            <p className="text-xs text-slate-400">Tap to mark who took tiffin</p>
           </div>
           {!isLocked && (
             <div className="flex items-center space-x-2">
@@ -238,7 +453,6 @@ export const TiffinsPage: React.FC = () => {
         <div className="space-y-2.5">
           {tenantUsers.map((tenant) => {
             const isTicked = currentRecord[tenant.key] === 1;
-            const isMyProfile = currentUser?.id === tenant.id;
 
             return (
               <button
@@ -266,10 +480,10 @@ export const TiffinsPage: React.FC = () => {
 
                   <div>
                     <span className={`text-sm font-bold block ${isTicked ? 'text-brand-900' : 'text-slate-800'}`}>
-                      {tenant.label} {isMyProfile ? '(You)' : ''}
+                      {tenant.label}
                     </span>
                     <span className="text-xs text-slate-400">
-                      {isTicked ? 'Meal Taken' : 'No meal'}
+                      {isTicked ? 'Meal Marked' : 'Not taken'}
                     </span>
                   </div>
                 </div>
@@ -283,8 +497,8 @@ export const TiffinsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Extras Counter (No extras description, clean +/-) */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+      {/* Extras Counter */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-bold text-slate-800">Extra Meals</h2>
           <p className="text-xs text-slate-400">Guests / extra tiffins (₹{TIFFIN_PRICE} each)</p>
@@ -314,7 +528,7 @@ export const TiffinsPage: React.FC = () => {
       </div>
 
       {/* Quick Slot Total */}
-      <div className="mt-4 px-2 flex items-center justify-between text-xs text-slate-500 font-medium">
+      <div className="px-2 flex items-center justify-between text-xs text-slate-500 font-medium">
         <span>Slot Total: {totalMealsThisSlot} tiffins</span>
         <span className="font-bold text-slate-700">₹{totalMealsThisSlot * TIFFIN_PRICE}</span>
       </div>
