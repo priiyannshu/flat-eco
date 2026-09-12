@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ElectricityBill } from '../types';
 import { api } from '../lib/api';
 import {
   Zap,
   Upload,
-  Calendar,
-  AlertCircle,
-  FileImage,
-  CheckCircle2,
   Eye,
   X,
-  CreditCard,
-  CloudLightning,
-  Info
+  FileImage,
+  Calendar
 } from 'lucide-react';
 
 export const BillsPage: React.FC = () => {
@@ -24,7 +19,6 @@ export const BillsPage: React.FC = () => {
   // Upload Form State (Owner)
   const [billingMonth, setBillingMonth] = useState<string>(new Date().toISOString().substring(0, 7));
   const [totalAmount, setTotalAmount] = useState<string>('');
-  const [billNumber, setBillNumber] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [imageData, setImageData] = useState<string | null>(null);
@@ -53,7 +47,7 @@ export const BillsPage: React.FC = () => {
 
   const isOwner = currentUser?.role === 'owner';
 
-  // Client-side image compression to WebP/JPEG under 150KB for fast D1 storage (No R2 payment card needed)
+  // Client-side image compression
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -63,7 +57,7 @@ export const BillsPage: React.FC = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const maxDim = 1200; // High enough for meter readings, compact in storage
+        const maxDim = 1200;
         let width = img.width;
         let height = img.height;
 
@@ -80,7 +74,6 @@ export const BillsPage: React.FC = () => {
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Compress to JPEG / WebP at 75% quality
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
         setImageData(compressedBase64);
         setImagePreview(compressedBase64);
@@ -99,7 +92,6 @@ export const BillsPage: React.FC = () => {
       await api.uploadBill(
         {
           billing_month: billingMonth,
-          bill_number: billNumber,
           total_amount: parseFloat(totalAmount),
           due_date: dueDate,
           image_data: imageData || undefined,
@@ -108,10 +100,8 @@ export const BillsPage: React.FC = () => {
         currentUser.id
       );
 
-      // Reset
       setShowUploadModal(false);
       setTotalAmount('');
-      setBillNumber('');
       setDueDate('');
       setNotes('');
       setImageData(null);
@@ -124,133 +114,107 @@ export const BillsPage: React.FC = () => {
     }
   };
 
-  // Latest active bill
   const latestBill = bills[0];
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-6 py-5 pb-24">
-      {/* Banner */}
-      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-5 text-white shadow-lg shadow-orange-500/15 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2">
-              <Zap className="w-3.5 h-3.5 text-yellow-200 fill-yellow-200" />
-              <span>Electricity & Utilities</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight">Electricity Bill & 4-Way Split</h1>
-            <p className="text-amber-100 text-xs sm:text-sm mt-0.5">
-              Split equally among 4 flatmates • In-app notifications sent upon upload
-            </p>
-          </div>
-
-          {isOwner && (
-            <button
-              onClick={() => setShowUploadModal(true)}
-              className="flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-orange-700 font-bold rounded-xl text-xs sm:text-sm shadow-md hover:bg-orange-50 transition-colors shrink-0"
-            >
-              <Upload className="w-4 h-4" />
-              <span>Upload New Bill</span>
-            </button>
-          )}
+    <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-xl font-extrabold text-slate-900">Electricity Bill</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Uploaded bills and past months log</p>
         </div>
+
+        {isOwner && (
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="flex items-center space-x-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs shadow-sm transition-colors"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            <span>Upload Bill</span>
+          </button>
+        )}
       </div>
 
-      {/* R2 Card & Storage Note (Answers User's Explicit Question) */}
-      <div className="p-4 mb-6 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-        <Info className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
-        <div className="text-xs text-slate-600 leading-relaxed">
-          <span className="font-bold text-slate-800">Do you need Cloudflare R2?</span> Bill images are automatically optimized and compressed client-side (under 120KB), and safely stored in <span className="font-semibold text-slate-800">Cloudflare D1</span> with zero external card requirement. If you later configure R2, the storage binding in <code className="bg-slate-200 px-1 py-0.5 rounded text-slate-800 font-mono">wrangler.toml</code> is already structured for instant plug-and-play!
-        </div>
-      </div>
-
-      {/* Latest Active Bill Spotlight */}
+      {/* Latest Bill Spotlight */}
       {latestBill ? (
-        <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 mb-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm mb-6">
+          <div className="flex items-start justify-between pb-4 border-b border-slate-100">
             <div>
-              <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Latest Billing Cycle</span>
-              <h2 className="text-lg font-black text-slate-900">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Latest Bill
+              </span>
+              <h2 className="text-lg font-black text-slate-900 mt-0.5">
                 {new Date(latestBill.billing_month + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </h2>
             </div>
             {latestBill.due_date && (
               <div className="text-right">
-                <span className="text-[11px] text-slate-400 block font-medium">Due Date</span>
+                <span className="text-[10px] text-slate-400 block font-medium">Due Date</span>
                 <span className="text-xs font-bold text-red-600">{latestBill.due_date}</span>
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-xs text-slate-400 font-medium block">Total Meter Invoice</span>
-              <span className="text-2xl font-black text-slate-900 mt-1 block">₹{latestBill.total_amount}</span>
-              <span className="text-[11px] text-slate-500">Full flat consumption</span>
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs text-slate-400 block">Total Amount</span>
+              <span className="text-3xl font-black text-slate-900 mt-0.5 block">
+                ₹{latestBill.total_amount}
+              </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
-              <span className="text-xs text-amber-700 font-bold block">Your 1/4th Share</span>
-              <span className="text-2xl font-black text-amber-700 mt-1 block">₹{latestBill.per_person_share}</span>
-              <span className="text-[11px] text-amber-800 font-medium">Auto-calculated per flatmate</span>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
-              <div>
-                <span className="text-xs text-slate-400 font-medium block">Invoice Attachment</span>
-                <span className="text-xs font-bold text-slate-800 mt-1 block">
-                  {latestBill.image_data ? 'Official Bill Attached' : 'No photo uploaded'}
-                </span>
-              </div>
-              {latestBill.image_data && (
-                <button
-                  onClick={() => setPreviewingBill(latestBill)}
-                  className="mt-2 flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold shadow-sm transition-colors"
-                >
-                  <Eye className="w-3.5 h-3.5 text-brand-600" />
-                  <span>View Bill Photo</span>
-                </button>
-              )}
-            </div>
+            {latestBill.image_data && (
+              <button
+                onClick={() => setPreviewingBill(latestBill)}
+                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+              >
+                <Eye className="w-4 h-4 text-slate-500" />
+                <span>View Bill Photo</span>
+              </button>
+            )}
           </div>
 
           {latestBill.notes && (
-            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-600">
-              <span className="font-semibold text-slate-700">Owner Notes:</span> {latestBill.notes}
+            <div className="mt-4 p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-600">
+              <span className="font-semibold text-slate-700">Note:</span> {latestBill.notes}
             </div>
           )}
         </div>
       ) : (
         <div className="bg-white rounded-2xl p-8 text-center border border-slate-200 mb-6">
-          <Zap className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-          <h3 className="text-sm font-bold text-slate-700">No electricity bills uploaded yet</h3>
+          <Zap className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+          <p className="text-sm font-bold text-slate-700">No electricity bills uploaded yet</p>
           <p className="text-xs text-slate-400 mt-1">
-            {isOwner ? 'Click "Upload New Bill" above to add the current month bill.' : 'The owner has not uploaded any bill yet.'}
+            {isOwner ? 'Click "Upload Bill" to publish the bill for flatmates.' : 'The owner has not uploaded any bill yet.'}
           </p>
         </div>
       )}
 
-      {/* Past Electricity Bills History */}
-      {bills.length > 1 && (
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-          <h3 className="text-sm font-bold text-slate-800 mb-4">Past Bills History</h3>
+      {/* Past Bills Log */}
+      {bills.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+          <h2 className="text-sm font-bold text-slate-800 mb-3">Past Months Log</h2>
           <div className="divide-y divide-slate-100">
-            {bills.slice(1).map((b) => (
+            {bills.map((b) => (
               <div key={b.id} className="py-3 flex items-center justify-between">
                 <div>
                   <span className="text-sm font-bold text-slate-800 block">
                     {new Date(b.billing_month + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </span>
-                  <span className="text-xs text-slate-400">Total: ₹{b.total_amount} • Due: {b.due_date || 'N/A'}</span>
+                  <span className="text-xs text-slate-400">
+                    {b.due_date ? `Due: ${b.due_date}` : 'Uploaded'}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-                    Share: ₹{b.per_person_share}
+                  <span className="text-sm font-extrabold text-slate-900">
+                    ₹{b.total_amount}
                   </span>
                   {b.image_data && (
                     <button
                       onClick={() => setPreviewingBill(b)}
-                      className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
-                      title="View bill photo"
+                      className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                      title="View Bill Photo"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -264,90 +228,63 @@ export const BillsPage: React.FC = () => {
 
       {/* Upload Bill Modal (Owner) */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-xl border border-slate-200 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-500 fill-amber-500" /> Upload Electricity Bill
-              </h3>
+              <h3 className="text-sm font-bold text-slate-900">Upload Electricity Bill</h3>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleUploadBill} className="space-y-4">
+            <form onSubmit={handleUploadBill} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Billing Month *</label>
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">Month *</label>
                   <input
                     type="month"
                     required
                     value={billingMonth}
                     onChange={(e) => setBillingMonth(e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-slate-700 block mb-1">Total Amount (₹) *</label>
                   <input
                     type="number"
-                    step="1"
                     required
-                    placeholder="e.g. 1800"
+                    placeholder="e.g. 1600"
                     value={totalAmount}
                     onChange={(e) => setTotalAmount(e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
-              {/* Real-time split preview */}
-              {totalAmount && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center justify-between">
-                  <span className="font-medium">4-Way Split:</span>
-                  <span className="font-extrabold text-amber-800">
-                    ₹{Math.round(parseFloat(totalAmount) / 4)} per roommate
-                  </span>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Due Date</label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Consumer / Bill #</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 102938475"
-                    value={billNumber}
-                    onChange={(e) => setBillNumber(e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* Bill Image Upload */}
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
-                  Bill Photo / Screenshot (Optional)
-                </label>
-                <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50 transition-colors">
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Due Date (Optional)</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+
+              {/* Bill Photo */}
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Bill Photo (Optional)</label>
+                <div className="border border-dashed border-slate-200 rounded-xl p-3 text-center">
                   {imagePreview ? (
-                    <div className="space-y-2">
+                    <div>
                       <img
                         src={imagePreview}
                         alt="Bill preview"
-                        className="max-h-40 mx-auto rounded-lg shadow-sm border border-slate-200"
+                        className="max-h-36 mx-auto rounded-lg mb-2"
                       />
                       <button
                         type="button"
@@ -355,37 +292,34 @@ export const BillsPage: React.FC = () => {
                           setImageData(null);
                           setImagePreview(null);
                         }}
-                        className="text-xs text-red-600 font-bold hover:underline"
+                        className="text-xs text-red-600 font-semibold"
                       >
                         Remove photo
                       </button>
                     </div>
                   ) : (
-                    <div>
-                      <FileImage className="w-8 h-8 text-slate-400 mx-auto mb-1" />
-                      <label className="cursor-pointer">
-                        <span className="text-xs font-bold text-amber-600 hover:text-amber-700">Click to upload photo</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          className="hidden"
-                        />
-                      </label>
-                      <p className="text-[10px] text-slate-400 mt-1">Auto-compressed under 150KB for fast sync</p>
-                    </div>
+                    <label className="cursor-pointer block py-2">
+                      <FileImage className="w-6 h-6 text-slate-400 mx-auto mb-1" />
+                      <span className="text-xs font-semibold text-brand-600">Choose photo or take picture</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">Notes / Instructions</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Notes (Optional)</label>
                 <input
                   type="text"
-                  placeholder="e.g. Units consumed: 180 kWh"
+                  placeholder="e.g. Units: 140 kWh"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
@@ -393,16 +327,16 @@ export const BillsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="px-5 py-2 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-sm transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-sm disabled:opacity-50"
                 >
-                  {uploading ? 'Uploading & Notifying...' : 'Publish Bill & Notify All'}
+                  {uploading ? 'Saving...' : 'Publish Bill'}
                 </button>
               </div>
             </form>
@@ -410,26 +344,26 @@ export const BillsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Bill Image Preview Modal */}
+      {/* Bill Photo Preview Modal */}
       {previewingBill && previewingBill.image_data && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-4 shadow-2xl border border-slate-200 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-              <span className="font-bold text-sm text-slate-800">
-                Electricity Bill: {previewingBill.billing_month} (Total ₹{previewingBill.total_amount})
+        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-4 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
+              <span className="font-bold text-xs text-slate-800">
+                Bill: {previewingBill.billing_month} (₹{previewingBill.total_amount})
               </span>
               <button
                 onClick={() => setPreviewingBill(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="max-h-[75vh] overflow-auto rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center p-2">
+            <div className="max-h-[70vh] overflow-auto rounded-xl flex items-center justify-center bg-slate-50 p-2">
               <img
                 src={previewingBill.image_data}
-                alt="Electricity Bill"
-                className="max-w-full h-auto rounded-lg shadow-sm"
+                alt="Bill"
+                className="max-w-full h-auto rounded-lg shadow-xs"
               />
             </div>
           </div>

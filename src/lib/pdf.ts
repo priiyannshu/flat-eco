@@ -188,7 +188,7 @@ export function generateReceiptPDF(
   doc.setFontSize(7);
   doc.setTextColor(148, 163, 184);
   doc.text(
-    'This is an electronically generated receipt verified on FlatEco Cloudflare Edge Ledger.',
+    'This is an electronically generated receipt verified on FlatEco.',
     74,
     202,
     { align: 'center' }

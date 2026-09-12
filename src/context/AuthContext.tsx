@@ -5,13 +5,10 @@ import { api, DEFAULT_PROFILES } from '../lib/api';
 interface AuthContextType {
   currentUser: UserProfile | null;
   allUsers: UserProfile[];
-  isDevMode: boolean;
-  devPasskey: string;
   login: (userId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
+  selectProfile: (user: UserProfile) => void;
   switchUser: (userId: string) => void;
   logout: () => void;
-  enableDevMode: (passkey: string) => Promise<boolean>;
-  disableDevMode: () => void;
   refreshUsers: () => Promise<void>;
 }
 
@@ -20,15 +17,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('flat_eco_user');
-    return saved ? JSON.parse(saved) : DEFAULT_PROFILES[1]; // Default to Tenant 1 (Me) for instant access
+    return saved ? JSON.parse(saved) : null; // Starts at null so opening screen shows profiles
   });
   const [allUsers, setAllUsers] = useState<UserProfile[]>(DEFAULT_PROFILES);
-  const [isDevMode, setIsDevMode] = useState<boolean>(() => {
-    return localStorage.getItem('flat_eco_dev_mode') === 'true';
-  });
-  const [devPasskey, setDevPasskey] = useState<string>(() => {
-    return localStorage.getItem('flat_eco_dev_key') || '';
-  });
 
   const refreshUsers = async () => {
     const users = await api.getUsers();
@@ -42,6 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     refreshUsers();
   }, []);
+
+  const selectProfile = (user: UserProfile) => {
+    setCurrentUser(user);
+    localStorage.setItem('flat_eco_user', JSON.stringify(user));
+  };
 
   const login = async (userId: string, pin: string) => {
     const res = await api.login(userId, pin);
@@ -66,37 +62,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('flat_eco_user');
   };
 
-  const enableDevMode = async (passkey: string) => {
-    const res = await api.devUnlock(passkey);
-    if (res.success) {
-      setIsDevMode(true);
-      setDevPasskey(passkey);
-      localStorage.setItem('flat_eco_dev_mode', 'true');
-      localStorage.setItem('flat_eco_dev_key', passkey);
-      return true;
-    }
-    return false;
-  };
-
-  const disableDevMode = () => {
-    setIsDevMode(false);
-    setDevPasskey('');
-    localStorage.removeItem('flat_eco_dev_mode');
-    localStorage.removeItem('flat_eco_dev_key');
-  };
-
   return (
     <AuthContext.Provider
       value={{
         currentUser,
         allUsers,
-        isDevMode,
-        devPasskey,
         login,
+        selectProfile,
         switchUser,
         logout,
-        enableDevMode,
-        disableDevMode,
         refreshUsers
       }}
     >

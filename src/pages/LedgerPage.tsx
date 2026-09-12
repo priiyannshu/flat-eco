@@ -277,7 +277,7 @@ export const LedgerPage: React.FC = () => {
             {/* Action buttons */}
             <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
               <span className="text-xs text-slate-400">
-                Data synced from Cloudflare D1 Edge Ledger
+                Synced securely
               </span>
               <button
                 onClick={() => handleDownloadMyReceipt(mySummary)}

@@ -1,33 +1,42 @@
 import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { SyncProvider } from './context/SyncContext';
 import { Navbar } from './components/Navbar';
+import { LoginScreen } from './components/LoginScreen';
 import { TiffinsPage } from './pages/TiffinsPage';
-import { RentPage } from './pages/RentPage';
+import { PaymentsPage } from './pages/PaymentsPage';
 import { BillsPage } from './pages/BillsPage';
-import { LedgerPage } from './pages/LedgerPage';
-import { ReceiptsPage } from './pages/ReceiptsPage';
-import { DevPage } from './pages/DevPage';
+import { RentPage } from './pages/RentPage';
 
-export const App: React.FC = () => {
-  // Default to 'tiffins' as it's the daily heart of the app
+const AppContent: React.FC = () => {
+  const { currentUser } = useAuth();
+  // Default to 'tiffins' (Home)
   const [currentTab, setCurrentTab] = useState<string>('tiffins');
 
+  // If no profile is logged in, show the profile selection screen
+  if (!currentUser) {
+    return <LoginScreen />;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
+
+      <main className="flex-1 pb-12">
+        {currentTab === 'tiffins' && <TiffinsPage />}
+        {currentTab === 'payments' && <PaymentsPage />}
+        {currentTab === 'bills' && <BillsPage />}
+        {currentTab === 'rent' && <RentPage />}
+      </main>
+    </div>
+  );
+};
+
+export const App: React.FC = () => {
   return (
     <AuthProvider>
       <SyncProvider>
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-          <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
-
-          <main className="flex-1">
-            {currentTab === 'tiffins' && <TiffinsPage />}
-            {currentTab === 'rent' && <RentPage />}
-            {currentTab === 'bills' && <BillsPage />}
-            {currentTab === 'ledger' && <LedgerPage />}
-            {currentTab === 'receipts' && <ReceiptsPage />}
-            {currentTab === 'dev' && <DevPage />}
-          </main>
-        </div>
+        <AppContent />
       </SyncProvider>
     </AuthProvider>
   );
