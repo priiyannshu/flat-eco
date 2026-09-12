@@ -1,0 +1,20 @@
+name = "flat-eco"
+main = "worker/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Static Assets (Vite PWA build output)
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Cloudflare D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "flat-eco-db"
+database_id = "39d99c25-9249-4a23-91d3-c7f236ed6ab2"
+
+# Optional Cloudflare R2 Storage (uncomment once R2 bucket is created if desired):
+# [[r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "flat-eco-storage"
