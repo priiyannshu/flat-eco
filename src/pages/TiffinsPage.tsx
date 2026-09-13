@@ -119,10 +119,10 @@ export const TiffinsPage: React.FC = () => {
 
   const tenantUsers = useMemo(() => {
     return [
-      { key: 'tenant_1' as const, label: allUsers.find((u) => u.id === 'tenant_1')?.name || 'Tenant 1', id: 'tenant_1' },
-      { key: 'tenant_2' as const, label: allUsers.find((u) => u.id === 'tenant_2')?.name || 'Tenant 2', id: 'tenant_2' },
-      { key: 'tenant_3' as const, label: allUsers.find((u) => u.id === 'tenant_3')?.name || 'Tenant 3', id: 'tenant_3' },
-      { key: 'tenant_4' as const, label: allUsers.find((u) => u.id === 'tenant_4')?.name || 'Tenant 4', id: 'tenant_4' }
+      { key: 'tenant_1' as const, label: allUsers.find((u) => u.id === 'tenant_1')?.name || 'Priyanshu', id: 'tenant_1' },
+      { key: 'tenant_2' as const, label: allUsers.find((u) => u.id === 'tenant_2')?.name || 'Sushil', id: 'tenant_2' },
+      { key: 'tenant_3' as const, label: allUsers.find((u) => u.id === 'tenant_3')?.name || 'Varsh', id: 'tenant_3' },
+      { key: 'tenant_4' as const, label: allUsers.find((u) => u.id === 'tenant_4')?.name || 'Sunny', id: 'tenant_4' }
     ];
   }, [allUsers]);
 

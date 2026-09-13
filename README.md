@@ -26,10 +26,10 @@ FlatEco comes pre-seeded with 5 profiles (switchable via the profile picker at t
    - Ability to tick rent as Paid/Pending for any tenant and record payment mode (UPI, Cash, Bank Transfer).
    - Ability to upload monthly electricity bills with attached photo receipts.
    - Ability to issue and transmit official receipts in-app to any tenant.
-2. **Tenant 1 (Me) (`tenant_1`)**: Private ledger, rent status, personal tiffin breakdown.
-3. **Tenant 2 (`tenant_2`)**: Private ledger, rent status, personal tiffin breakdown.
-4. **Tenant 3 (`tenant_3`)**: Private ledger, rent status, personal tiffin breakdown.
-5. **Tenant 4 (`tenant_4`)**: Private ledger, rent status, personal tiffin breakdown.
+2. **Priyanshu (`tenant_1`)**: Private ledger, rent status, personal tiffin breakdown.
+3. **Sushil (`tenant_2`)**: Private ledger, rent status, personal tiffin breakdown.
+4. **Varsh (`tenant_3`)**: Private ledger, rent status, personal tiffin breakdown.
+5. **Sunny (`tenant_4`)**: Private ledger, rent status, personal tiffin breakdown.
 
 > **Privacy Guarantee**: Flatmates can **only view their own records and bills**. The owner is the only user with access to view everyone's combined ledger.
 

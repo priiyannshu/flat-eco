@@ -12,10 +12,10 @@ import {
 // Default mock profiles for instant out-of-the-box usage
 export const DEFAULT_PROFILES: UserProfile[] = [
   { id: 'owner', name: 'Apartment Owner', role: 'owner', room_or_info: 'Owner / Caretaker', pin: '1234', created_at: Date.now() },
-  { id: 'tenant_1', name: 'Tenant 1 (Me)', role: 'tenant', room_or_info: 'Room A - Bed 1', pin: '1234', created_at: Date.now() },
-  { id: 'tenant_2', name: 'Tenant 2', role: 'tenant', room_or_info: 'Room A - Bed 2', pin: '1234', created_at: Date.now() },
-  { id: 'tenant_3', name: 'Tenant 3', role: 'tenant', room_or_info: 'Room B - Bed 1', pin: '1234', created_at: Date.now() },
-  { id: 'tenant_4', name: 'Tenant 4', role: 'tenant', room_or_info: 'Room B - Bed 2', pin: '1234', created_at: Date.now() },
+  { id: 'tenant_1', name: 'Priyanshu', role: 'tenant', room_or_info: 'Room A - Bed 1', pin: '1234', created_at: Date.now() },
+  { id: 'tenant_2', name: 'Sushil', role: 'tenant', room_or_info: 'Room A - Bed 2', pin: '1234', created_at: Date.now() },
+  { id: 'tenant_3', name: 'Varsh', role: 'tenant', room_or_info: 'Room B - Bed 1', pin: '1234', created_at: Date.now() },
+  { id: 'tenant_4', name: 'Sunny', role: 'tenant', room_or_info: 'Room B - Bed 2', pin: '1234', created_at: Date.now() },
 ];
 
 export const DEFAULT_SETTINGS: AppSettings = {
