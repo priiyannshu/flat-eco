@@ -12,3 +12,12 @@ body {
 input, select, textarea {
   user-select: text;
 }
+
+/* Adapt native controls like date pickers and scrollbars */
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}

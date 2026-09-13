@@ -77,21 +77,23 @@ export const RentPage: React.FC = () => {
       {/* Header with Year Selector */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900">Rent Log</h1>
-          <p className="text-xs text-slate-500 mt-0.5">₹{MONTHLY_RENT} / month flat share</p>
+          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Rent Log</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">₹{MONTHLY_RENT} / month flat share</p>
         </div>
 
-        <div className="flex items-center space-x-2 bg-white px-2 py-1 rounded-xl border border-slate-200">
+        <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 px-2 py-1 rounded-xl border border-slate-200 dark:border-slate-800">
           <button
             onClick={() => setSelectedYear((y) => y - 1)}
-            className="p-1 rounded-lg text-slate-500 hover:bg-slate-100"
+            className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Previous Year"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-xs font-bold text-slate-800">{selectedYear}</span>
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{selectedYear}</span>
           <button
             onClick={() => setSelectedYear((y) => y + 1)}
-            className="p-1 rounded-lg text-slate-500 hover:bg-slate-100"
+            className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Next Year"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -100,9 +102,9 @@ export const RentPage: React.FC = () => {
 
       {/* TENANT LOG VIEW */}
       {!isOwner && (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <h2 className="text-sm font-bold text-slate-800 mb-3">Your Rent Records ({selectedYear})</h2>
-          <div className="divide-y divide-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">Your Rent Records ({selectedYear})</h2>
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {monthsOfYear.map((month) => {
               const rec = getRecord(currentUser?.id || '', month);
               const isPaid = rec?.is_paid === 1;
@@ -112,21 +114,21 @@ export const RentPage: React.FC = () => {
               return (
                 <div key={month} className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-bold text-slate-800 block">{monthName}</span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">{monthName}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
                       {isPaid && rec?.paid_date ? `Paid on ${rec.paid_date}` : `Rent: ₹${MONTHLY_RENT}`}
                     </span>
                   </div>
 
                   <div>
                     {isPaid ? (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-full text-xs font-bold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                         <span>Paid</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-bold">
-                        <Clock className="w-3 h-3 text-amber-600" />
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-full text-xs font-bold">
+                        <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                         <span>Pending</span>
                       </span>
                     )}
@@ -140,10 +142,10 @@ export const RentPage: React.FC = () => {
 
       {/* OWNER LOG VIEW */}
       {isOwner && (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="mb-4">
-            <h2 className="text-sm font-bold text-slate-800">Owner Verification Log</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Tap any roommate to toggle Paid / Pending status</p>
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200">Owner Verification Log</h2>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Tap any roommate to toggle Paid / Pending status</p>
           </div>
 
           <div className="space-y-3">
@@ -152,10 +154,10 @@ export const RentPage: React.FC = () => {
               const monthName = dateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
               return (
-                <div key={month} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <div key={month} className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-extrabold text-slate-800">{monthName}</span>
-                    <span className="text-[11px] text-slate-400">₹{MONTHLY_RENT}</span>
+                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200">{monthName}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500">₹{MONTHLY_RENT}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -169,19 +171,19 @@ export const RentPage: React.FC = () => {
                           onClick={() => handleToggleRent(t, month)}
                           className={`p-2.5 rounded-lg border text-left transition-all ${
                             isPaid
-                              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                              : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold truncate block">{t.name}</span>
                             {isPaid ? (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             ) : (
-                              <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                             )}
                           </div>
-                          <span className={`text-[10px] font-bold block mt-0.5 ${isPaid ? 'text-emerald-700' : 'text-amber-600'}`}>
+                          <span className={`text-[10px] font-bold block mt-0.5 ${isPaid ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                             {isPaid ? 'PAID' : 'PENDING'}
                           </span>
                         </button>

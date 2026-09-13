@@ -83,34 +83,34 @@ export const LoginScreen: React.FC = () => {
   // Tenants are locked down on their respective devices
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center px-4 py-8 transition-colors duration-200">
       <div className="w-full max-w-md">
         {/* App Branding */}
         <div className="text-center mb-7">
           <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-3 shadow-lg shadow-amber-500/20">
             <Shield className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">FlatEco Setup</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Setting up device for <span className="font-semibold text-slate-700">{owner.name}</span>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">FlatEco Setup</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Setting up device for <span className="font-semibold text-slate-700 dark:text-slate-200">{owner.name}</span>
           </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-xl text-xs flex items-center gap-2">
+          <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 rounded-xl text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-          <div className="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+          <div className="flex items-center space-x-3 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg bg-amber-500 shadow-sm shadow-amber-500/20">
               <Shield className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">{owner.name}</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">{owner.name}</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-400">
                 Apartment Caretaker & Admin
               </p>
             </div>
@@ -118,8 +118,8 @@ export const LoginScreen: React.FC = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Enter Setup PIN (Default: <code className="text-brand-600">1234</code>)
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Enter Setup PIN (Default: <code className="text-brand-600 dark:text-brand-400">1234</code>)
               </label>
               <input
                 type="password"
@@ -128,7 +128,7 @@ export const LoginScreen: React.FC = () => {
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
                 placeholder="1234"
-                className="w-full text-center text-lg tracking-widest font-mono py-2.5 px-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full text-center text-lg tracking-widest font-mono py-2.5 px-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
 
@@ -144,9 +144,9 @@ export const LoginScreen: React.FC = () => {
             </button>
 
             <div className="relative flex py-1 items-center">
-              <div className="flex-grow border-t border-slate-200"></div>
-              <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400">or</span>
-              <div className="flex-grow border-t border-slate-200"></div>
+              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+              <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">or</span>
+              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
             </div>
 
             {/* Fallback PIN button */}
@@ -154,13 +154,13 @@ export const LoginScreen: React.FC = () => {
               type="button"
               onClick={() => handlePinLogin()}
               disabled={loading || !pinInput}
-              className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors disabled:opacity-50"
+              className="w-full py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors disabled:opacity-50"
             >
               Set Up Device with PIN Only
             </button>
           </div>
 
-          <p className="text-[11px] text-slate-400 text-center mt-5 leading-relaxed">
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-5 leading-relaxed">
             Tenant setups are locked down. This phone will be configured exclusively for the Apartment Owner profile.
           </p>
         </div>

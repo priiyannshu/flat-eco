@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SyncProvider } from './context/SyncContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { LoginScreen } from './components/LoginScreen';
 import { TiffinsPage } from './pages/TiffinsPage';
@@ -19,7 +20,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
 
       <main className="flex-1 pb-12">
@@ -34,11 +35,13 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <SyncProvider>
-        <AppContent />
-      </SyncProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SyncProvider>
+          <AppContent />
+        </SyncProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

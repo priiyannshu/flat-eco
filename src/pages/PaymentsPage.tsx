@@ -151,28 +151,28 @@ export const PaymentsPage: React.FC = () => {
     <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-extrabold text-slate-900">Payments</h1>
-        <p className="text-xs text-slate-500 mt-0.5">{monthName} dues and owner UPI QR</p>
+        <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Payments</h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{monthName} dues and owner UPI QR</p>
       </div>
 
       {/* TENANT VIEW: WHAT YOU NEED TO PAY FOR */}
       {!isOwner && tenantDues && (
         <div className="space-y-5">
           {/* Total Due Highlight Card */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
               Total Amount Due
             </span>
             <div className="flex items-baseline justify-between mt-1">
-              <span className="text-3xl font-black text-brand-700">₹{tenantDues.totalDue}</span>
+              <span className="text-3xl font-black text-brand-700 dark:text-brand-400">₹{tenantDues.totalDue}</span>
               {tenantDues.totalDue === 0 ? (
-                <span className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                  <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                <span className="inline-flex items-center text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-full">
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
                   All Dues Clear
                 </span>
               ) : (
-                <span className="inline-flex items-center text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-                  <Clock className="w-3.5 h-3.5 mr-1 text-amber-600" />
+                <span className="inline-flex items-center text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-full">
+                  <Clock className="w-3.5 h-3.5 mr-1 text-amber-600 dark:text-amber-400" />
                   Payment Pending
                 </span>
               )}
@@ -180,27 +180,27 @@ export const PaymentsPage: React.FC = () => {
           </div>
 
           {/* Dues Breakdown List */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <h2 className="text-sm font-bold text-slate-800 mb-3">What You Need To Pay For</h2>
-            <div className="space-y-3 divide-y divide-slate-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">What You Need To Pay For</h2>
+            <div className="space-y-3 divide-y divide-slate-100 dark:divide-slate-800">
               {/* Rent */}
               <div className="pt-2.5 first:pt-0 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                  <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
                     <Home className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-slate-800 block">Monthly Rent</span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">Monthly Rent</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
                       {tenantDues.isRentPaid ? 'Verified Paid by Owner' : 'Pending for this month'}
                     </span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`text-sm font-black ${tenantDues.isRentPaid ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                  <span className={`text-sm font-black ${tenantDues.isRentPaid ? 'text-slate-400 dark:text-slate-600 line-through' : 'text-slate-900 dark:text-white'}`}>
                     ₹{MONTHLY_RENT}
                   </span>
-                  <span className={`block text-[10px] font-bold ${tenantDues.isRentPaid ? 'text-emerald-600' : 'text-amber-600'}`}>
+                  <span className={`block text-[10px] font-bold ${tenantDues.isRentPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                     {tenantDues.isRentPaid ? 'Paid' : 'Due: ₹2,000'}
                   </span>
                 </div>
@@ -209,21 +209,21 @@ export const PaymentsPage: React.FC = () => {
               {/* Tiffins */}
               <div className="pt-3 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                  <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
                     <UtensilsCrossed className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-slate-800 block">Tiffins Consumed</span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">Tiffins Consumed</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
                       {tenantDues.tiffinCount} meals @ ₹{TIFFIN_PRICE}/meal
                     </span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-black text-slate-900">
+                  <span className="text-sm font-black text-slate-900 dark:text-white">
                     ₹{tenantDues.tiffinAmountDue}
                   </span>
-                  <span className="block text-[10px] font-bold text-brand-600">
+                  <span className="block text-[10px] font-bold text-brand-600 dark:text-brand-400">
                     {tenantDues.tiffinCount} tiffins
                   </span>
                 </div>
@@ -233,21 +233,21 @@ export const PaymentsPage: React.FC = () => {
               {latestBill && (
                 <div className="pt-3 flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-amber-500">
+                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-amber-500">
                       <Zap className="w-4 h-4 fill-amber-500" />
                     </div>
                     <div>
-                      <span className="text-sm font-bold text-slate-800 block">Electricity Bill</span>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">Electricity Bill</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
                         {latestBill.billing_month} • {latestBill.due_date ? `Due: ${latestBill.due_date}` : 'Uploaded'}
                       </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm font-black text-slate-900">
+                    <span className="text-sm font-black text-slate-900 dark:text-white">
                       ₹{latestBill.total_amount}
                     </span>
-                    <span className="block text-[10px] text-slate-400">Flat total</span>
+                    <span className="block text-[10px] text-slate-400 dark:text-slate-500">Flat total</span>
                   </div>
                 </div>
               )}
@@ -255,14 +255,14 @@ export const PaymentsPage: React.FC = () => {
           </div>
 
           {/* QR Code & Payment Action Card */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm text-center">
-            <h2 className="text-sm font-bold text-slate-800 mb-1">Pay Owner via UPI</h2>
-            <p className="text-xs text-slate-400 mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Pay Owner via UPI</h2>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
               Scan this QR with any UPI app (GPay, PhonePe, Paytm) or tap to pay
             </p>
 
-            {/* QR Code Display */}
-            <div className="inline-block bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-4">
+            {/* QR Code Display (Kept on clean white card for maximum contrast scanning) */}
+            <div className="inline-block bg-white p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
               <img
                 src={qrCodeUrl}
                 alt="Owner UPI QR Code"
@@ -272,17 +272,17 @@ export const PaymentsPage: React.FC = () => {
             </div>
 
             {/* UPI ID Pill */}
-            <div className="max-w-xs mx-auto bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center justify-between mb-4">
+            <div className="max-w-xs mx-auto bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 flex items-center justify-between mb-4">
               <div className="text-left pl-1 truncate">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Owner UPI ID</span>
-                <span className="text-xs font-bold text-slate-800 truncate block">{ownerUpi}</span>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Owner UPI ID</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block">{ownerUpi}</span>
               </div>
               <button
                 onClick={handleCopyUpi}
-                className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
+                className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors shrink-0"
                 title="Copy UPI ID"
               >
-                {copiedUpi ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                {copiedUpi ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
 
@@ -302,32 +302,32 @@ export const PaymentsPage: React.FC = () => {
       {isOwner && (
         <div className="space-y-5">
           {/* Flat Total Receivables */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
               Total Pending Receivables ({monthName})
             </span>
-            <span className="text-3xl font-black text-brand-700 block mt-1">₹{totalFlatReceivables}</span>
-            <span className="text-xs text-slate-400 mt-1 block">Across all 4 flatmates</span>
+            <span className="text-3xl font-black text-brand-700 dark:text-brand-400 block mt-1">₹{totalFlatReceivables}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 mt-1 block">Across all 4 flatmates</span>
           </div>
 
           {/* Tenants Dues Table */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <h2 className="text-sm font-bold text-slate-800 mb-3">Roommate Balances</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">Roommate Balances</h2>
             <div className="space-y-2.5">
               {ownerSummary.map((item) => (
                 <div
                   key={item.tenant.id}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between"
+                  className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between"
                 >
                   <div>
-                    <span className="font-bold text-sm text-slate-900 block">{item.tenant.name}</span>
-                    <span className="text-xs text-slate-500">
+                    <span className="font-bold text-sm text-slate-900 dark:text-white block">{item.tenant.name}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       Rent: {item.isRentPaid ? 'Paid' : 'Pending (₹2000)'} • Tiffins: {item.mealCount} (₹{item.tiffinCost})
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm font-black text-slate-900 block">₹{item.totalDue}</span>
-                    <span className={`text-[10px] font-bold ${item.totalDue === 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    <span className="text-sm font-black text-slate-900 dark:text-white block">₹{item.totalDue}</span>
+                    <span className={`text-[10px] font-bold ${item.totalDue === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                       {item.totalDue === 0 ? 'Clear' : 'Pending'}
                     </span>
                   </div>
@@ -337,11 +337,11 @@ export const PaymentsPage: React.FC = () => {
           </div>
 
           {/* Owner UPI Settings & QR Preview */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm text-center">
-            <h2 className="text-sm font-bold text-slate-800 mb-1">Your Receiving UPI ID & QR</h2>
-            <p className="text-xs text-slate-400 mb-4">Tenants will scan this QR to pay you directly</p>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Your Receiving UPI ID & QR</h2>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">Tenants will scan this QR to pay you directly</p>
 
-            <div className="inline-block bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-4">
+            <div className="inline-block bg-white p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
               <img
                 src={qrCodeUrl}
                 alt="Owner UPI QR Code"
@@ -357,24 +357,24 @@ export const PaymentsPage: React.FC = () => {
                   value={upiInput}
                   onChange={(e) => setUpiInput(e.target.value)}
                   placeholder="e.g. yourname@okhdfcbank"
-                  className="flex-1 text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="flex-1 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
                 <button
                   type="submit"
-                  className="px-3 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold"
+                  className="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-colors"
                 >
                   Save
                 </button>
               </form>
             ) : (
-              <div className="max-w-xs mx-auto bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center justify-between">
+              <div className="max-w-xs mx-auto bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 flex items-center justify-between">
                 <div className="text-left pl-1 truncate">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Active UPI ID</span>
-                  <span className="text-xs font-bold text-slate-800 truncate block">{ownerUpi}</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Active UPI ID</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block">{ownerUpi}</span>
                 </div>
                 <button
                   onClick={() => setEditingUpi(true)}
-                  className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+                  className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
                   title="Change UPI ID"
                 >
                   <Edit2 className="w-3.5 h-3.5" />

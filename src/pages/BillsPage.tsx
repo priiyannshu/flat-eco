@@ -124,8 +124,8 @@ export const BillsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900">Electricity Bill</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Uploaded bills and past months log</p>
+          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Electricity Bill</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Uploaded bills and past months log</p>
         </div>
 
         {isOwner && (
@@ -141,28 +141,28 @@ export const BillsPage: React.FC = () => {
 
       {/* Latest Bill Spotlight */}
       {latestBill ? (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm mb-6">
-          <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
+          <div className="flex items-start justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
                 Latest Bill
               </span>
-              <h2 className="text-lg font-black text-slate-900 mt-0.5">
+              <h2 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
                 {new Date(latestBill.billing_month + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </h2>
             </div>
             {latestBill.due_date && (
               <div className="text-right">
-                <span className="text-[10px] text-slate-400 block font-medium">Due Date</span>
-                <span className="text-xs font-bold text-red-600">{latestBill.due_date}</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-medium">Due Date</span>
+                <span className="text-xs font-bold text-red-600 dark:text-red-400">{latestBill.due_date}</span>
               </div>
             )}
           </div>
 
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-xs text-slate-400 block">Total Amount</span>
-              <span className="text-3xl font-black text-slate-900 mt-0.5 block">
+              <span className="text-xs text-slate-400 dark:text-slate-500 block">Total Amount</span>
+              <span className="text-3xl font-black text-slate-900 dark:text-white mt-0.5 block">
                 ₹{latestBill.total_amount}
               </span>
             </div>
@@ -170,25 +170,25 @@ export const BillsPage: React.FC = () => {
             {latestBill.image_data && (
               <button
                 onClick={() => setPreviewingBill(latestBill)}
-                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                className="inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs transition-colors"
               >
-                <Eye className="w-4 h-4 text-slate-500" />
+                <Eye className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                 <span>View Bill Photo</span>
               </button>
             )}
           </div>
 
           {latestBill.notes && (
-            <div className="mt-4 p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-600">
-              <span className="font-semibold text-slate-700">Note:</span> {latestBill.notes}
+            <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-xl text-xs text-slate-600 dark:text-slate-300">
+              <span className="font-semibold text-slate-700 dark:text-slate-200">Note:</span> {latestBill.notes}
             </div>
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-8 text-center border border-slate-200 mb-6">
-          <Zap className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-          <p className="text-sm font-bold text-slate-700">No electricity bills uploaded yet</p>
-          <p className="text-xs text-slate-400 mt-1">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center border border-slate-200 dark:border-slate-800 mb-6">
+          <Zap className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">No electricity bills uploaded yet</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
             {isOwner ? 'Click "Upload Bill" to publish the bill for flatmates.' : 'The owner has not uploaded any bill yet.'}
           </p>
         </div>
@@ -196,27 +196,27 @@ export const BillsPage: React.FC = () => {
 
       {/* Past Bills Log */}
       {bills.length > 0 && (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <h2 className="text-sm font-bold text-slate-800 mb-3">Past Months Log</h2>
-          <div className="divide-y divide-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">Past Months Log</h2>
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {bills.map((b) => (
               <div key={b.id} className="py-3 flex items-center justify-between">
                 <div>
-                  <span className="text-sm font-bold text-slate-800 block">
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">
                     {new Date(b.billing_month + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-400 dark:text-slate-500">
                     {b.due_date ? `Due: ${b.due_date}` : 'Uploaded'}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="text-sm font-extrabold text-slate-900">
+                  <span className="text-sm font-extrabold text-slate-900 dark:text-white">
                     ₹{b.total_amount}
                   </span>
                   {b.image_data && (
                     <button
                       onClick={() => setPreviewingBill(b)}
-                      className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                       title="View Bill Photo"
                     >
                       <Eye className="w-4 h-4" />
@@ -231,13 +231,13 @@ export const BillsPage: React.FC = () => {
 
       {/* Upload Bill Modal (Owner) */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-xl border border-slate-200 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <h3 className="text-sm font-bold text-slate-900">Upload Electricity Bill</h3>
+        <div className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-5 shadow-xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Upload Electricity Bill</h3>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -246,42 +246,42 @@ export const BillsPage: React.FC = () => {
             <form onSubmit={handleUploadBill} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Month *</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Month *</label>
                   <input
                     type="month"
                     required
                     value={billingMonth}
                     onChange={(e) => setBillingMonth(e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Total Amount (₹) *</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Total Amount (₹) *</label>
                   <input
                     type="number"
                     required
                     placeholder="e.g. 1600"
                     value={totalAmount}
                     onChange={(e) => setTotalAmount(e.target.value)}
-                    className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">Due Date (Optional)</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Due Date (Optional)</label>
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               {/* Bill Photo */}
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">Bill Photo (Optional)</label>
-                <div className="border border-dashed border-slate-200 rounded-xl p-3 text-center">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Bill Photo (Optional)</label>
+                <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-3 text-center bg-slate-50/50 dark:bg-slate-800/40">
                   {imagePreview ? (
                     <div>
                       <img
@@ -295,15 +295,15 @@ export const BillsPage: React.FC = () => {
                           setImageData(null);
                           setImagePreview(null);
                         }}
-                        className="text-xs text-red-600 font-semibold"
+                        className="text-xs text-red-600 dark:text-red-400 font-semibold"
                       >
                         Remove photo
                       </button>
                     </div>
                   ) : (
                     <label className="cursor-pointer block py-2">
-                      <FileImage className="w-6 h-6 text-slate-400 mx-auto mb-1" />
-                      <span className="text-xs font-semibold text-brand-600">Choose photo or take picture</span>
+                      <FileImage className="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto mb-1" />
+                      <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">Choose photo or take picture</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -316,13 +316,13 @@ export const BillsPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Notes (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Units: 140 kWh"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
@@ -330,7 +330,7 @@ export const BillsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl"
                 >
                   Cancel
                 </button>
@@ -349,20 +349,20 @@ export const BillsPage: React.FC = () => {
 
       {/* Bill Photo Preview Modal */}
       {previewingBill && previewingBill.image_data && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-4 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
-              <span className="font-bold text-xs text-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/80 dark:bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-4 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-3">
+              <span className="font-bold text-xs text-slate-800 dark:text-slate-200">
                 Bill: {previewingBill.billing_month} (₹{previewingBill.total_amount})
               </span>
               <button
                 onClick={() => setPreviewingBill(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-200"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-auto rounded-xl flex items-center justify-center bg-slate-50 p-2">
+            <div className="max-h-[70vh] overflow-auto rounded-xl flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-2">
               <img
                 src={previewingBill.image_data}
                 alt="Bill"

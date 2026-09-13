@@ -214,22 +214,22 @@ export const TiffinsPage: React.FC = () => {
         {/* Header & Month Selector */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Tiffins</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Your daily meal log</p>
+            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Tiffins</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your daily meal log</p>
           </div>
 
-          <div className="flex items-center space-x-1.5 bg-white px-2 py-1 rounded-xl border border-slate-200">
+          <div className="flex items-center space-x-1.5 bg-white dark:bg-slate-900 px-2 py-1 rounded-xl border border-slate-200 dark:border-slate-800">
             <button
               onClick={() => changeMonth(-1)}
-              className="p-1 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               title="Previous Month"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-bold text-slate-800 px-1">{monthTitle}</span>
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 px-1">{monthTitle}</span>
             <button
               onClick={() => changeMonth(1)}
-              className="p-1 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               title="Next Month"
             >
               <ChevronRight className="w-4 h-4" />
@@ -238,39 +238,39 @@ export const TiffinsPage: React.FC = () => {
         </div>
 
         {/* Month Summary Card for Tenant */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm mb-5 flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm mb-5 flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
               Meals Taken ({monthTitle})
             </span>
-            <span className="text-2xl font-black text-brand-700 block mt-0.5">
-              {tenantMonthStats.count} <span className="text-xs font-medium text-slate-400">tiffins</span>
+            <span className="text-2xl font-black text-brand-700 dark:text-brand-400 block mt-0.5">
+              {tenantMonthStats.count} <span className="text-xs font-medium text-slate-400 dark:text-slate-500">tiffins</span>
             </span>
           </div>
           <div className="text-right">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
               Total Cost
             </span>
-            <span className="text-2xl font-black text-slate-900 block mt-0.5">
+            <span className="text-2xl font-black text-slate-900 dark:text-white block mt-0.5">
               ₹{tenantMonthStats.amount}
             </span>
-            <span className="text-[10px] text-slate-400 block font-medium">₹{TIFFIN_PRICE} / meal</span>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-medium">₹{TIFFIN_PRICE} / meal</span>
           </div>
         </div>
 
         {/* Tiffin Records Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider">
+                <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
                   <th className="py-3 px-4">Date</th>
                   <th className="py-3 px-3">Lunch</th>
                   <th className="py-3 px-3">Dinner</th>
                   <th className="py-3 px-4 text-right">Daily</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {daysInMonth.map((dateStr) => {
                   const lunchRec = records.find((r) => r.date === dateStr && r.meal_type === 'lunch');
                   const dinnerRec = records.find((r) => r.date === dateStr && r.meal_type === 'dinner');
@@ -286,20 +286,20 @@ export const TiffinsPage: React.FC = () => {
                   });
 
                   return (
-                    <tr key={dateStr} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="py-3 px-4 font-bold text-slate-800">
+                    <tr key={dateStr} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                      <td className="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">
                         {dateFormatted}
                       </td>
 
                       {/* Lunch Column */}
                       <td className="py-3 px-3">
                         {isLunchMarked ? (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
                             <span>Marked</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 bg-slate-100">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800">
                             Not Marked
                           </span>
                         )}
@@ -308,12 +308,12 @@ export const TiffinsPage: React.FC = () => {
                       {/* Dinner Column */}
                       <td className="py-3 px-3">
                         {isDinnerMarked ? (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
                             <span>Marked</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 bg-slate-100">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800">
                             Not Marked
                           </span>
                         )}
@@ -322,11 +322,11 @@ export const TiffinsPage: React.FC = () => {
                       {/* Daily Total Column */}
                       <td className="py-3 px-4 text-right">
                         {dayMeals > 0 ? (
-                          <span className="font-extrabold text-slate-900">
-                            {dayMeals} <span className="text-[10px] text-slate-500 font-medium">(₹{dayMeals * TIFFIN_PRICE})</span>
+                          <span className="font-extrabold text-slate-900 dark:text-white">
+                            {dayMeals} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">(₹{dayMeals * TIFFIN_PRICE})</span>
                           </span>
                         ) : (
-                          <span className="text-slate-300 font-medium">—</span>
+                          <span className="text-slate-300 dark:text-slate-600 font-medium">—</span>
                         )}
                       </td>
                     </tr>
@@ -348,22 +348,22 @@ export const TiffinsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900">Tiffin Counter</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Mark daily meals for flatmates</p>
+          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Tiffin Counter</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Mark daily meals for flatmates</p>
         </div>
-        <span className="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-xl border border-brand-200">
+        <span className="text-xs font-bold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/50 px-2.5 py-1 rounded-xl border border-brand-200 dark:border-brand-800">
           ₹{TIFFIN_PRICE} / meal
         </span>
       </div>
 
       {/* Date & Meal Slot Control */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 mb-5">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Date Selector */}
           <div className="flex items-center space-x-1.5 w-full sm:w-auto justify-between">
             <button
               onClick={() => changeDate(-1)}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
               title="Previous Day"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -378,12 +378,12 @@ export const TiffinsPage: React.FC = () => {
                   setSelectedMonth(e.target.value.substring(0, 7));
                 }
               }}
-              className="font-bold text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+              className="font-bold text-xs text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             />
 
             <button
               onClick={() => changeDate(1)}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
               title="Next Day"
             >
               <ChevronRight className="w-4 h-4" />
@@ -397,7 +397,7 @@ export const TiffinsPage: React.FC = () => {
               className={`px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
                 selectedDate === todayStr
                   ? 'bg-brand-600 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               Today
@@ -405,13 +405,13 @@ export const TiffinsPage: React.FC = () => {
           </div>
 
           {/* Meal Toggle (Lunch vs Dinner) */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full sm:w-auto">
             <button
               onClick={() => setSelectedMeal('lunch')}
               className={`flex-1 sm:flex-none flex items-center justify-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 selectedMeal === 'lunch'
-                  ? 'bg-white text-brand-700 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-brand-700 dark:text-brand-300 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Sun className="w-3.5 h-3.5 text-amber-500" />
@@ -421,8 +421,8 @@ export const TiffinsPage: React.FC = () => {
               onClick={() => setSelectedMeal('dinner')}
               className={`flex-1 sm:flex-none flex items-center justify-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 selectedMeal === 'dinner'
-                  ? 'bg-white text-indigo-700 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Moon className="w-3.5 h-3.5 text-indigo-500" />
@@ -433,31 +433,31 @@ export const TiffinsPage: React.FC = () => {
 
         {/* Lock Banner */}
         {isLocked && (
-          <div className="mt-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center space-x-2 text-slate-500 text-xs">
-            <Lock className="w-4 h-4 text-slate-400 shrink-0" />
+          <div className="mt-3 p-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center space-x-2 text-slate-500 dark:text-slate-400 text-xs">
+            <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
             <span>Record locked (24 hours elapsed)</span>
           </div>
         )}
       </div>
 
       {/* Main Meal Ticking Board */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 mb-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-sm font-bold text-slate-800">4 Roommates</h2>
-            <p className="text-xs text-slate-400">Tap to mark who took tiffin</p>
+            <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200">4 Roommates</h2>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Tap to mark who took tiffin</p>
           </div>
           {!isLocked && (
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setAllTenants(1)}
-                className="text-xs font-semibold bg-brand-50 text-brand-700 hover:bg-brand-100 px-2.5 py-1 rounded-lg transition-colors"
+                className="text-xs font-semibold bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/40 px-2.5 py-1 rounded-lg transition-colors"
               >
                 All
               </button>
               <button
                 onClick={() => setAllTenants(0)}
-                className="text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition-colors"
+                className="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-2.5 py-1 rounded-lg transition-colors"
               >
                 None
               </button>
@@ -476,10 +476,10 @@ export const TiffinsPage: React.FC = () => {
                 onClick={() => toggleTenant(tenant.key)}
                 className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left ${
                   isLocked
-                    ? 'opacity-80 cursor-not-allowed bg-slate-50 border-slate-200'
+                    ? 'opacity-80 cursor-not-allowed bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800'
                     : isTicked
-                    ? 'bg-brand-50/70 border-brand-300 ring-1 ring-brand-400 shadow-xs'
-                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'bg-brand-50/70 dark:bg-brand-950/40 border-brand-300 dark:border-brand-700 ring-1 ring-brand-400 dark:ring-brand-500 shadow-xs'
+                    : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -487,23 +487,23 @@ export const TiffinsPage: React.FC = () => {
                     className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
                       isTicked
                         ? 'bg-brand-600 text-white'
-                        : 'border-2 border-slate-300 bg-white'
+                        : 'border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                     }`}
                   >
                     {isTicked ? <CheckCircle2 className="w-4 h-4 fill-brand-600 text-white" /> : null}
                   </div>
 
                   <div>
-                    <span className={`text-sm font-bold block ${isTicked ? 'text-brand-900' : 'text-slate-800'}`}>
+                    <span className={`text-sm font-bold block ${isTicked ? 'text-brand-900 dark:text-brand-200' : 'text-slate-800 dark:text-slate-200'}`}>
                       {tenant.label}
                     </span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
                       {isTicked ? 'Meal Marked' : 'Not taken'}
                     </span>
                   </div>
                 </div>
 
-                <span className={`text-xs font-bold ${isTicked ? 'text-brand-700' : 'text-slate-400'}`}>
+                <span className={`text-xs font-bold ${isTicked ? 'text-brand-700 dark:text-brand-400' : 'text-slate-400 dark:text-slate-500'}`}>
                   {isTicked ? `₹${TIFFIN_PRICE}` : '₹0'}
                 </span>
               </button>
@@ -513,22 +513,22 @@ export const TiffinsPage: React.FC = () => {
       </div>
 
       {/* Extras Counter */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between mb-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-sm font-bold text-slate-800">Extra Meals</h2>
-          <p className="text-xs text-slate-400">Guests / extra tiffins (₹{TIFFIN_PRICE} each)</p>
+          <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200">Extra Meals</h2>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Guests / extra tiffins (₹{TIFFIN_PRICE} each)</p>
         </div>
 
         <div className="flex items-center space-x-3">
           <button
             disabled={isLocked || (currentRecord.extras || 0) <= 0}
             onClick={() => changeExtras(-1)}
-            className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <Minus className="w-4 h-4" />
           </button>
 
-          <span className="text-base font-extrabold text-slate-900 w-6 text-center">
+          <span className="text-base font-extrabold text-slate-900 dark:text-white w-6 text-center">
             {currentRecord.extras || 0}
           </span>
 
@@ -543,9 +543,9 @@ export const TiffinsPage: React.FC = () => {
       </div>
 
       {/* Quick Slot Total */}
-      <div className="px-2 flex items-center justify-between text-xs text-slate-500 font-medium">
+      <div className="px-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
         <span>Slot Total: {totalMealsThisSlot} tiffins</span>
-        <span className="font-bold text-slate-700">₹{totalMealsThisSlot * TIFFIN_PRICE}</span>
+        <span className="font-bold text-slate-700 dark:text-slate-300">₹{totalMealsThisSlot * TIFFIN_PRICE}</span>
       </div>
     </div>
   );
