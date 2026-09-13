@@ -84,6 +84,38 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at INTEGER NOT NULL
 );
 
+-- Passkeys (WebAuthn Credentials for Face ID / Fingerprint)
+CREATE TABLE IF NOT EXISTS user_passkeys (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  credential_id TEXT NOT NULL UNIQUE,
+  public_key TEXT,
+  counter INTEGER DEFAULT 0,
+  device_name TEXT,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Cryptographically bound user sessions
+CREATE TABLE IF NOT EXISTS user_sessions (
+  token TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  role TEXT NOT NULL,
+  device_name TEXT,
+  expires_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- One-time WebAuthn challenges
+CREATE TABLE IF NOT EXISTS auth_challenges (
+  challenge TEXT PRIMARY KEY,
+  user_id TEXT,
+  type TEXT NOT NULL,          -- 'registration' or 'authentication'
+  expires_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
 -- Seed Initial Profiles and Default Configuration
 INSERT OR IGNORE INTO users (id, name, role, room_or_info, pin, created_at) VALUES
   ('owner', 'Apartment Owner', 'owner', 'Admin & Landlord', '1234', 1726000000000),
@@ -106,3 +138,6 @@ CREATE INDEX IF NOT EXISTS idx_rent_user_month ON rent_records(user_id, month);
 CREATE INDEX IF NOT EXISTS idx_bills_month ON electricity_bills(billing_month);
 CREATE INDEX IF NOT EXISTS idx_receipts_user ON receipts(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_target ON notifications(target_user_id);
+CREATE INDEX IF NOT EXISTS idx_passkeys_user ON user_passkeys(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON user_sessions(token);

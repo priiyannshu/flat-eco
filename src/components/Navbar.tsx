@@ -13,7 +13,8 @@ import {
   Wifi,
   WifiOff,
   RefreshCw,
-  LogOut,
+  Lock,
+  Shield,
   ChevronRight
 } from 'lucide-react';
 import { AppNotification } from '../types';
@@ -25,7 +26,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, lockApp, unbindDevice } = useAuth();
   const { isOnline, pendingCount, isSyncing, syncNow } = useSync();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
@@ -205,17 +206,23 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
               {currentUser && (
                 <div className="p-4 bg-slate-50 border-b border-slate-100">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold ${
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-sm ${
                       currentUser.role === 'owner' ? 'bg-amber-500' : 'bg-brand-600'
                     }`}>
                       {currentUser.name.charAt(0)}
                     </div>
-                    <div className="truncate">
-                      <span className="text-sm font-bold text-slate-900 block truncate">
-                        {currentUser.name}
-                      </span>
+                    <div className="truncate flex-1">
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-sm font-bold text-slate-900 block truncate">
+                          {currentUser.name}
+                        </span>
+                        <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">
+                          <Shield className="w-2.5 h-2.5 mr-0.5" />
+                          Locked
+                        </span>
+                      </div>
                       <span className="text-xs text-slate-400 block capitalize">
-                        {currentUser.role === 'owner' ? 'Owner / Caretaker' : currentUser.room_or_info || 'Tenant'}
+                        {currentUser.role === 'owner' ? 'Apartment Owner' : currentUser.room_or_info || 'Tenant'}
                       </span>
                     </div>
                   </div>
@@ -251,17 +258,29 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
               </nav>
             </div>
 
-            {/* Drawer Bottom Action: Switch Profile / Log Out */}
-            <div className="p-4 border-t border-slate-100">
+            {/* Drawer Bottom Actions: Lock Device & Unbind Device */}
+            <div className="p-4 border-t border-slate-100 space-y-2">
               <button
                 onClick={() => {
-                  logout();
+                  lockApp();
                   setDrawerOpen(false);
                 }}
-                className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
+                className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
               >
-                <LogOut className="w-4 h-4 text-slate-500" />
-                <span>Switch Profile</span>
+                <Lock className="w-3.5 h-3.5 text-slate-300" />
+                <span>Lock Device</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (confirm('Unbind this device? This will reset the device lock and sign out.')) {
+                    unbindDevice();
+                    setDrawerOpen(false);
+                  }
+                }}
+                className="w-full flex items-center justify-center space-x-1.5 py-1.5 text-slate-400 hover:text-red-500 text-[11px] font-medium transition-colors"
+              >
+                <span>Reset Device Binding</span>
               </button>
             </div>
           </div>

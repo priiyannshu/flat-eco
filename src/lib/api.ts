@@ -27,10 +27,28 @@ export const DEFAULT_SETTINGS: AppSettings = {
 };
 
 class ApiClient {
+  private sessionToken: string | null = typeof localStorage !== 'undefined' ? localStorage.getItem('flat_eco_token') : null;
+
+  setSessionToken(token: string | null) {
+    this.sessionToken = token;
+    if (token) {
+      localStorage.setItem('flat_eco_token', token);
+    } else {
+      localStorage.removeItem('flat_eco_token');
+    }
+  }
+
+  getSessionToken(): string | null {
+    return this.sessionToken;
+  }
+
   private getHeaders(userId?: string, devKey?: string): HeadersInit {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     };
+    if (this.sessionToken) {
+      headers['Authorization'] = `Bearer ${this.sessionToken}`;
+    }
     if (userId) headers['x-user-id'] = userId;
     if (devKey) headers['x-dev-key'] = devKey;
     return headers;
@@ -61,16 +79,97 @@ class ApiClient {
     return DEFAULT_PROFILES;
   }
 
-  async login(userId: string, pin: string): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
+  async checkSession(): Promise<{ user?: UserProfile } | null> {
+    if (!this.sessionToken) return null;
+    try {
+      const res = await fetch('/api/auth/me', { headers: this.getHeaders() });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // network issue
+    }
+    return null;
+  }
+
+  async getPasskeyStatus(userId: string): Promise<{ hasPasskey: boolean; count: number; devices?: any[] }> {
+    try {
+      const res = await fetch(`/api/auth/passkey/status?userId=${encodeURIComponent(userId)}`);
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {}
+    return { hasPasskey: false, count: 0 };
+  }
+
+  async getPasskeyRegisterOptions(userId: string, setupPin?: string): Promise<any> {
+    const res = await fetch('/api/auth/passkey/register-options', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, setupPin })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to initialize passkey registration');
+    return data;
+  }
+
+  async verifyPasskeyRegister(userId: string, credential: any, deviceName?: string): Promise<{ success: boolean; token?: string; user?: UserProfile; error?: string }> {
+    const res = await fetch('/api/auth/passkey/register-verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, credential, deviceName })
+    });
+    const data = await res.json();
+    if (data.token) {
+      this.setSessionToken(data.token);
+    }
+    return data;
+  }
+
+  async getPasskeyAuthOptions(userId: string): Promise<any> {
+    const res = await fetch('/api/auth/passkey/auth-options', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to initialize passkey authentication');
+    return data;
+  }
+
+  async verifyPasskeyAuth(userId: string, assertion: any, deviceName?: string): Promise<{ success: boolean; token?: string; user?: UserProfile; error?: string }> {
+    const res = await fetch('/api/auth/passkey/auth-verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, assertion, deviceName })
+    });
+    const data = await res.json();
+    if (data.token) {
+      this.setSessionToken(data.token);
+    }
+    return data;
+  }
+
+  async logoutServer(): Promise<void> {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', headers: this.getHeaders() });
+    } catch {}
+    this.setSessionToken(null);
+  }
+
+  async login(userId: string, pin: string, deviceName?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; error?: string }> {
     try {
       if (navigator.onLine) {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: this.getHeaders(),
-          body: JSON.stringify({ userId, pin })
+          body: JSON.stringify({ userId, pin, deviceName })
         });
         if (res.ok) {
           const data = await res.json();
+          if (data.token) {
+            this.setSessionToken(data.token);
+          }
           return data;
         } else {
           const err = await res.json();

@@ -9,12 +9,12 @@ import { BillsPage } from './pages/BillsPage';
 import { RentPage } from './pages/RentPage';
 
 const AppContent: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, isLocked } = useAuth();
   // Default to 'tiffins' (Home)
   const [currentTab, setCurrentTab] = useState<string>('tiffins');
 
-  // If no profile is logged in, show the profile selection screen
-  if (!currentUser) {
+  // If no profile is authenticated or device is locked, show the biometric lock screen
+  if (!currentUser || isLocked) {
     return <LoginScreen />;
   }
 
