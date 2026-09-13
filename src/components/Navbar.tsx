@@ -15,7 +15,8 @@ import {
   Shield,
   ChevronRight,
   Sun,
-  Moon
+  Moon,
+  ClipboardList
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -29,8 +30,25 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
   const { isDark, toggleTheme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const isOwner = currentUser?.role === 'owner';
+
   const navItems = [
-    { id: 'tiffins', label: 'Tiffins', icon: UtensilsCrossed, description: 'Daily meals counter' },
+    {
+      id: 'tiffins',
+      label: isOwner ? 'Daily Tiffin Counter' : 'Tiffins',
+      icon: UtensilsCrossed,
+      description: isOwner ? 'Mark daily meals' : 'Daily meals counter'
+    },
+    ...(isOwner
+      ? [
+          {
+            id: 'tiffin-log',
+            label: 'Tiffin Log',
+            icon: ClipboardList,
+            description: "Bird's eye view of tiffins"
+          }
+        ]
+      : []),
     { id: 'bills', label: 'Electricity Bill', icon: Zap, description: 'Upload & view bills' },
     { id: 'rent', label: 'Rent Log', icon: Home, description: 'Monthly rent records' },
     { id: 'payments', label: 'Payments', icon: CreditCard, description: 'UPI QR & dues' },

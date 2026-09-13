@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { LoginScreen } from './components/LoginScreen';
 import { TiffinsPage } from './pages/TiffinsPage';
+import { TiffinLogPage } from './pages/TiffinLogPage';
 import { PaymentsPage } from './pages/PaymentsPage';
 import { BillsPage } from './pages/BillsPage';
 import { RentPage } from './pages/RentPage';
@@ -24,7 +25,14 @@ const AppContent: React.FC = () => {
       <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
 
       <main className="flex-1 pb-12">
-        {currentTab === 'tiffins' && <TiffinsPage />}
+        {currentTab === 'tiffins' && <TiffinsPage onTabChange={setCurrentTab} />}
+        {currentTab === 'tiffin-log' && (
+          currentUser.role === 'owner' ? (
+            <TiffinLogPage onTabChange={setCurrentTab} />
+          ) : (
+            <TiffinsPage onTabChange={setCurrentTab} />
+          )
+        )}
         {currentTab === 'bills' && <BillsPage />}
         {currentTab === 'rent' && <RentPage />}
         {currentTab === 'payments' && <PaymentsPage />}

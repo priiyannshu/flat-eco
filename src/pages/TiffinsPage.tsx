@@ -32,7 +32,11 @@ const getLocalMonthString = (d = new Date()) => {
   return `${year}-${month}`;
 };
 
-export const TiffinsPage: React.FC = () => {
+interface TiffinsPageProps {
+  onTabChange?: (tab: string) => void;
+}
+
+export const TiffinsPage: React.FC<TiffinsPageProps> = ({ onTabChange }) => {
   const { currentUser, allUsers } = useAuth();
   const isOwner = currentUser?.role === 'owner';
 
@@ -345,6 +349,21 @@ export const TiffinsPage: React.FC = () => {
   // ==========================================
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Owner Top Tabs: Daily Counter vs Tiffin Log */}
+      <div className="flex p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-xl mb-5 border border-slate-200 dark:border-slate-700/60 shadow-xs">
+        <button
+          className="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 text-brand-700 dark:text-brand-300 shadow-sm"
+        >
+          Daily Tiffin Counter
+        </button>
+        <button
+          onClick={() => onTabChange?.('tiffin-log')}
+          className="flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+        >
+          Tiffin Log (Bird's Eye)
+        </button>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
