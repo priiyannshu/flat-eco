@@ -214,7 +214,7 @@ export const LedgerPage: React.FC = () => {
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Statement For</span>
                 <h2 className="text-xl font-extrabold text-slate-900">{mySummary.tenant.name}</h2>
                 <p className="text-xs text-slate-500">
-                  {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • {mySummary.tenant.room_or_info}
+                  {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </p>
               </div>
 
@@ -360,7 +360,6 @@ export const LedgerPage: React.FC = () => {
                     <tr key={s.tenant.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-3.5 pl-2 font-bold text-slate-900">
                         {s.tenant.name}
-                        <span className="block text-[10px] text-slate-400 font-normal">{s.tenant.room_or_info}</span>
                       </td>
                       <td className="py-3.5 font-semibold text-slate-700">{s.mealCount} meals</td>
                       <td className="py-3.5 font-bold text-brand-700">₹{s.tiffinCost}</td>

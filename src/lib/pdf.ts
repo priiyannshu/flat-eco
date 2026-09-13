@@ -55,7 +55,7 @@ export function generateReceiptPDF(
   doc.setFont('helvetica', 'bold');
   doc.text('Tenant:', 14, 47);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${tenant.name} (${tenant.room_or_info || 'Resident'})`, 32, 47);
+  doc.text(tenant.name, 32, 47);
 
   doc.setFont('helvetica', 'bold');
   doc.text('Date Issued:', 85, 47);
@@ -89,7 +89,7 @@ export function generateReceiptPDF(
     {
       num: '1',
       title: 'Flat Rent Share',
-      sub: `Room accommodation for ${receipt.month}`,
+      sub: `Flat accommodation for ${receipt.month}`,
       qty: '1 Month',
       amt: receipt.rent_amount
     },

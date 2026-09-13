@@ -119,10 +119,10 @@ CREATE TABLE IF NOT EXISTS auth_challenges (
 -- Seed Initial Profiles and Default Configuration
 INSERT OR IGNORE INTO users (id, name, role, room_or_info, pin, created_at) VALUES
   ('owner', 'Apartment Owner', 'owner', 'Admin & Landlord', '1234', 1726000000000),
-  ('tenant_1', 'Priyanshu', 'tenant', 'Room 1', '1234', 1726000000000),
-  ('tenant_2', 'Sushil', 'tenant', 'Room 2', '1234', 1726000000000),
-  ('tenant_3', 'Varsh', 'tenant', 'Room 3', '1234', 1726000000000),
-  ('tenant_4', 'Sunny', 'tenant', 'Room 4', '1234', 1726000000000);
+  ('tenant_1', 'Priyanshu', 'tenant', 'Tenant', '1234', 1726000000000),
+  ('tenant_2', 'Sushil', 'tenant', 'Tenant', '1234', 1726000000000),
+  ('tenant_3', 'Varsh', 'tenant', 'Tenant', '1234', 1726000000000),
+  ('tenant_4', 'Sunny', 'tenant', 'Tenant', '1234', 1726000000000);
 
 INSERT OR IGNORE INTO app_settings (key, value) VALUES
   ('tiffin_price', '60'),

@@ -220,7 +220,7 @@ export const ReceiptsPage: React.FC = () => {
                 >
                   {tenants.map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.name} ({t.room_or_info})
+                      {t.name}
                     </option>
                   ))}
                 </select>
