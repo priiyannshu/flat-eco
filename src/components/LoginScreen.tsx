@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
-import { api } from '../lib/api';
 import {
   Shield,
-  Lock,
   ScanFace,
-  KeyRound,
   AlertCircle
 } from 'lucide-react';
 
@@ -14,8 +11,8 @@ export const LoginScreen: React.FC = () => {
   const {
     allUsers,
     deviceBoundUserId,
+    selectProfile,
     enrollDevicePasskey,
-    unlockWithPasskey,
     loginWithPin
   } = useAuth();
 
@@ -34,30 +31,17 @@ export const LoginScreen: React.FC = () => {
   const [pinInput, setPinInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPinFallback, setShowPinFallback] = useState(false);
 
+  // If device is already bound to a user, activate immediately without showing any lock screen
   useEffect(() => {
     if (boundUser) {
-      api.getPasskeyStatus(boundUser.id).then(() => {});
+      selectProfile(boundUser);
     }
   }, [boundUser]);
 
-  // Attempt instant Face ID / Passkey unlock for returning bound user
-  const handlePasskeyUnlock = async () => {
-    if (!activeUser) return;
-    setErrorMsg('');
-    setLoading(true);
-    try {
-      const res = await unlockWithPasskey(activeUser.id);
-      if (!res.success) {
-        setErrorMsg(res.error || 'Biometric verification cancelled.');
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Passkey verification failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (boundUser) {
+    return null;
+  }
 
   // Enroll device with Face ID / Passkey (Owner setup)
   const handleEnrollPasskey = async () => {
@@ -88,124 +72,15 @@ export const LoginScreen: React.FC = () => {
         setErrorMsg(res.error || 'Incorrect PIN');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login error');
+      setErrorMsg(err.message || 'Setup error');
     } finally {
       setLoading(false);
     }
   };
 
   // -------------------------------------------------------------
-  // VIEW A: Locked Device (Device already bound to a specific user)
-  // -------------------------------------------------------------
-  if (boundUser) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4 py-8 text-white select-none">
-        <div className="w-full max-w-sm text-center">
-          {/* Lock & App Icon */}
-          <div className="relative inline-block mb-5">
-            <div className="w-20 h-20 rounded-3xl bg-brand-600/20 border border-brand-500/30 flex items-center justify-center text-brand-400 mx-auto shadow-2xl shadow-brand-500/10">
-              <ScanFace className="w-10 h-10" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-slate-950 shadow-md">
-              <Lock className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-black tracking-tight text-white mb-1">
-            Flat<span className="text-brand-400">Eco</span> Lock
-          </h1>
-          <p className="text-xs text-slate-400 mb-6">
-            Device securely locked to <span className="font-bold text-white">{boundUser.name}</span>
-          </p>
-
-          {/* User Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-5 text-left flex items-center space-x-3.5">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-base shadow-sm ${
-              boundUser.role === 'owner' ? 'bg-amber-500' : 'bg-brand-600'
-            }`}>
-              {boundUser.name.charAt(0)}
-            </div>
-            <div className="truncate flex-1">
-              <span className="text-sm font-bold text-white block truncate">{boundUser.name}</span>
-              <span className="text-xs text-slate-400 block capitalize">
-                {boundUser.role === 'owner' ? 'Apartment Owner' : 'Tenant'}
-              </span>
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-              Bound
-            </span>
-          </div>
-
-          {/* Error Message */}
-          {errorMsg && (
-            <div className="mb-4 p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-xs text-red-300 flex items-center gap-2 text-left">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {/* Primary Biometric Unlock Button */}
-          {!showPinFallback && (
-            <div className="space-y-3">
-              <button
-                onClick={handlePasskeyUnlock}
-                disabled={loading}
-                className="w-full py-4 px-5 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 active:scale-[0.99] text-white font-bold text-sm rounded-2xl shadow-xl shadow-brand-500/25 flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
-              >
-                <ScanFace className="w-5 h-5 text-brand-200" />
-                <span>{loading ? 'Authenticating...' : 'Unlock with Face ID / Passkey'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowPinFallback(true)}
-                className="w-full py-3 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors flex items-center justify-center space-x-1"
-              >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span>Use PIN fallback</span>
-              </button>
-            </div>
-          )}
-
-          {/* PIN Fallback View */}
-          {showPinFallback && (
-            <form onSubmit={handlePinLogin} className="space-y-3 animate-in fade-in duration-150">
-              <input
-                type="password"
-                maxLength={6}
-                inputMode="numeric"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                placeholder="Enter 4-digit PIN"
-                autoFocus
-                className="w-full text-center text-lg tracking-widest font-mono py-3.5 px-4 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
-              />
-
-              <button
-                type="submit"
-                disabled={loading || !pinInput}
-                className="w-full py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm rounded-xl transition-colors disabled:opacity-50"
-              >
-                {loading ? 'Verifying...' : 'Unlock Device'}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowPinFallback(false)}
-                className="text-xs text-slate-400 hover:text-slate-200 underline pt-1 block mx-auto"
-              >
-                Back to Face ID
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // -------------------------------------------------------------
-  // VIEW B: Fresh Device Setup (Only Apartment Owner)
-  // Tenants are stripped away to enforce complete lockdown
+  // Fresh Device Setup (Apartment Owner)
+  // Tenants are locked down on their respective devices
   // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 py-8">
@@ -217,7 +92,7 @@ export const LoginScreen: React.FC = () => {
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">FlatEco Setup</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Locking device to <span className="font-semibold text-slate-700">{owner.name}</span>
+            Setting up device for <span className="font-semibold text-slate-700">{owner.name}</span>
           </p>
         </div>
 
@@ -265,7 +140,7 @@ export const LoginScreen: React.FC = () => {
               className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
             >
               <ScanFace className="w-4 h-4 text-amber-100" />
-              <span>{loading ? 'Registering...' : 'Lock Device with Face ID / Passkey'}</span>
+              <span>{loading ? 'Registering...' : 'Set Up Device with Face ID / Passkey'}</span>
             </button>
 
             <div className="relative flex py-1 items-center">
@@ -281,12 +156,12 @@ export const LoginScreen: React.FC = () => {
               disabled={loading || !pinInput}
               className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors disabled:opacity-50"
             >
-              Lock Device with PIN Only
+              Set Up Device with PIN Only
             </button>
           </div>
 
           <p className="text-[11px] text-slate-400 text-center mt-5 leading-relaxed">
-            Tenant setups are locked down. This phone will be bound exclusively to the Apartment Owner profile.
+            Tenant setups are locked down. This phone will be configured exclusively for the Apartment Owner profile.
           </p>
         </div>
       </div>

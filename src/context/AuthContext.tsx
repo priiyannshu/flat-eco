@@ -18,6 +18,7 @@ interface AuthContextType {
   enrollDevicePasskey: (userId: string, setupPin?: string) => Promise<{ success: boolean; error?: string }>;
   unlockWithPasskey: (targetUserId?: string) => Promise<{ success: boolean; error?: string }>;
   loginWithPin: (userId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
+  selectProfile: (user: UserProfile) => void;
   lockApp: () => void;
   unbindDevice: () => Promise<void>;
   refreshUsers: () => Promise<void>;
@@ -35,13 +36,33 @@ function getDevicePlatform(): string {
   return 'Personal Device';
 }
 
+function getInitialUser(): UserProfile | null {
+  try {
+    const saved = localStorage.getItem('flat_eco_user');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    const boundId = localStorage.getItem('flat_eco_device_user_id');
+    if (boundId) {
+      const match = DEFAULT_PROFILES.find((u) => u.id === boundId);
+      if (match) {
+        localStorage.setItem('flat_eco_user', JSON.stringify(match));
+        return match;
+      }
+    }
+  } catch (e) {
+    console.error('Error restoring initial user from localStorage:', e);
+  }
+  return null;
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [deviceBoundUserId, setDeviceBoundUserId] = useState<string | null>(() => {
     return localStorage.getItem('flat_eco_device_user_id');
   });
 
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [isLocked, setIsLocked] = useState<boolean>(true);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getInitialUser);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
   const [allUsers, setAllUsers] = useState<UserProfile[]>(DEFAULT_PROFILES);
   const [passkeySupported, setPasskeySupported] = useState<boolean>(false);
   const [biometricsAvailable, setBiometricsAvailable] = useState<boolean>(false);
@@ -51,7 +72,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAllUsers(users);
     if (currentUser) {
       const updated = users.find(u => u.id === currentUser.id);
-      if (updated) setCurrentUser(updated);
+      if (updated) {
+        setCurrentUser(updated);
+        localStorage.setItem('flat_eco_user', JSON.stringify(updated));
+      }
     }
   };
 
@@ -61,28 +85,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isPlatformAuthenticatorAvailable().then(setBiometricsAvailable);
   }, []);
 
-  // Check existing session on boot
+  // Sync users and verify session on boot in background without blocking or locking
   useEffect(() => {
     const initAuth = async () => {
-      await refreshUsers();
+      try {
+        const users = await api.getUsers();
+        setAllUsers(users);
 
-      // Check if server session is still valid
-      const sessionResult = await api.checkSession();
-      if (sessionResult && sessionResult.user) {
-        setCurrentUser(sessionResult.user);
-        setIsLocked(false);
-        if (!deviceBoundUserId) {
-          setDeviceBoundUserId(sessionResult.user.id);
-          localStorage.setItem('flat_eco_device_user_id', sessionResult.user.id);
+        // Keep currentUser updated with latest server state
+        const boundId = localStorage.getItem('flat_eco_device_user_id');
+        const savedUserStr = localStorage.getItem('flat_eco_user');
+        const savedUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+        const targetId = savedUser?.id || boundId || currentUser?.id;
+
+        if (targetId) {
+          const fresh = users.find((u) => u.id === targetId);
+          if (fresh) {
+            setCurrentUser(fresh);
+            localStorage.setItem('flat_eco_user', JSON.stringify(fresh));
+            if (!boundId) {
+              setDeviceBoundUserId(fresh.id);
+              localStorage.setItem('flat_eco_device_user_id', fresh.id);
+            }
+          }
         }
-      } else {
-        // Session expired or missing - locked
-        setIsLocked(true);
+
+        // Verify session in background to refresh server token if possible
+        const sessionResult = await api.checkSession();
+        if (sessionResult && sessionResult.user) {
+          setCurrentUser(sessionResult.user);
+          localStorage.setItem('flat_eco_user', JSON.stringify(sessionResult.user));
+          if (!deviceBoundUserId) {
+            setDeviceBoundUserId(sessionResult.user.id);
+            localStorage.setItem('flat_eco_device_user_id', sessionResult.user.id);
+          }
+        }
+      } catch (err) {
+        console.error('Background auth init error:', err);
       }
     };
 
     initAuth();
-  }, [deviceBoundUserId]);
+  }, []);
+
+  const selectProfile = (user: UserProfile) => {
+    setCurrentUser(user);
+    setIsLocked(false);
+    setDeviceBoundUserId(user.id);
+    localStorage.setItem('flat_eco_user', JSON.stringify(user));
+    localStorage.setItem('flat_eco_device_user_id', user.id);
+  };
 
   // Register device passkey (e.g. Face ID / Fingerprint)
   const enrollDevicePasskey = async (
@@ -96,10 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const res = await api.verifyPasskeyRegister(userId, credential, deviceName);
       if (res.success && res.user) {
-        setCurrentUser(res.user);
-        setIsLocked(false);
-        setDeviceBoundUserId(res.user.id);
-        localStorage.setItem('flat_eco_device_user_id', res.user.id);
+        selectProfile(res.user);
         return { success: true };
       }
       return { success: false, error: res.error || 'Passkey enrollment failed' };
@@ -122,10 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const res = await api.verifyPasskeyAuth(userId, assertion, deviceName);
       if (res.success && res.user) {
-        setCurrentUser(res.user);
-        setIsLocked(false);
-        setDeviceBoundUserId(res.user.id);
-        localStorage.setItem('flat_eco_device_user_id', res.user.id);
+        selectProfile(res.user);
         return { success: true };
       }
       return { success: false, error: res.error || 'Biometric authentication failed' };
@@ -140,10 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const deviceName = getDevicePlatform();
       const res = await api.login(userId, pin, deviceName);
       if (res.success && res.user) {
-        setCurrentUser(res.user);
-        setIsLocked(false);
-        setDeviceBoundUserId(res.user.id);
-        localStorage.setItem('flat_eco_device_user_id', res.user.id);
+        selectProfile(res.user);
         return { success: true };
       }
       return { success: false, error: res.error || 'Authentication failed' };
@@ -152,17 +195,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Lock the device (requires biometric or PIN re-authentication)
+  // Lock the device (no-op now since lock device feature was removed)
   const lockApp = () => {
-    setIsLocked(true);
-    setCurrentUser(null);
+    // Intentionally no-op to prevent locking on reload or user action
   };
 
   // Unbind this device (clears local binding and server session)
   const unbindDevice = async () => {
     await api.logoutServer();
     setCurrentUser(null);
-    setIsLocked(true);
+    setIsLocked(false);
     setDeviceBoundUserId(null);
     localStorage.removeItem('flat_eco_device_user_id');
     localStorage.removeItem('flat_eco_token');
@@ -181,6 +223,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         enrollDevicePasskey,
         unlockWithPasskey,
         loginWithPin,
+        selectProfile,
         lockApp,
         unbindDevice,
         refreshUsers

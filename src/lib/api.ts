@@ -49,7 +49,16 @@ class ApiClient {
     if (this.sessionToken) {
       headers['Authorization'] = `Bearer ${this.sessionToken}`;
     }
-    if (userId) headers['x-user-id'] = userId;
+    const currentUserId = userId || (typeof localStorage !== 'undefined'
+      ? (() => {
+          try {
+            const saved = localStorage.getItem('flat_eco_user');
+            if (saved) return JSON.parse(saved).id;
+          } catch {}
+          return localStorage.getItem('flat_eco_device_user_id');
+        })()
+      : null);
+    if (currentUserId) headers['x-user-id'] = currentUserId;
     if (devKey) headers['x-dev-key'] = devKey;
     return headers;
   }
@@ -80,7 +89,6 @@ class ApiClient {
   }
 
   async checkSession(): Promise<{ user?: UserProfile } | null> {
-    if (!this.sessionToken) return null;
     try {
       const res = await fetch('/api/auth/me', { headers: this.getHeaders() });
       if (res.ok) {

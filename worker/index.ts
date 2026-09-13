@@ -387,27 +387,45 @@ app.get('/api/auth/me', async (c) => {
   try {
     const authHeader = c.req.header('Authorization');
     const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
-    if (!token) return c.json({ error: 'No token' }, 401);
+    if (token) {
+      const session = await c.env.DB.prepare(`
+        SELECT s.token, s.user_id, s.role, s.expires_at, u.name, u.room_or_info
+        FROM user_sessions s
+        JOIN users u ON s.user_id = u.id
+        WHERE s.token = ? AND s.expires_at > ?
+      `).bind(token, Date.now()).first() as any;
 
-    const session = await c.env.DB.prepare(`
-      SELECT s.token, s.user_id, s.role, s.expires_at, u.name, u.room_or_info
-      FROM user_sessions s
-      JOIN users u ON s.user_id = u.id
-      WHERE s.token = ? AND s.expires_at > ?
-    `).bind(token, Date.now()).first() as any;
-
-    if (!session) {
-      return c.json({ error: 'Invalid or expired session' }, 401);
+      if (session) {
+        return c.json({
+          user: {
+            id: session.user_id,
+            name: session.name,
+            role: session.role,
+            room_or_info: session.room_or_info
+          }
+        });
+      }
     }
 
-    return c.json({
-      user: {
-        id: session.user_id,
-        name: session.name,
-        role: session.role,
-        room_or_info: session.room_or_info
+    // Fallback to legacy/bound x-user-id header
+    const legacyUserId = c.req.header('x-user-id');
+    if (legacyUserId) {
+      const user = await c.env.DB.prepare(
+        'SELECT id, name, role, room_or_info FROM users WHERE id = ?'
+      ).bind(legacyUserId).first() as any;
+      if (user) {
+        return c.json({
+          user: {
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            room_or_info: user.room_or_info
+          }
+        });
       }
-    });
+    }
+
+    return c.json({ error: 'Invalid or expired session' }, 401);
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }

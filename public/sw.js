@@ -1,4 +1,4 @@
-const CACHE_NAME = 'flat-eco-v5';
+const CACHE_NAME = 'flat-eco-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
