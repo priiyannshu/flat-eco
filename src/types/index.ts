@@ -52,28 +52,12 @@ export interface ElectricityBill {
   created_at: number;
 }
 
-export interface ReceiptRecord {
-  id: string;
-  user_id: string;
-  month: string; // YYYY-MM
-  rent_amount: number;
-  tiffin_count: number;
-  tiffin_amount: number;
-  electricity_amount: number;
-  extras_amount: number;
-  total_amount: number;
-  status: 'issued' | 'viewed' | 'settled';
-  issued_at: number;
-  issued_by: string;
-  notes?: string;
-}
-
 export interface AppNotification {
   id: string;
   target_user_id: string; // 'all' or specific user_id
   title: string;
   message: string;
-  type: 'bill' | 'receipt' | 'rent' | 'lock' | 'system';
+  type: 'bill' | 'rent' | 'lock' | 'system';
   data_json?: string;
   is_read: number;
   created_at: number;
@@ -90,7 +74,7 @@ export interface AppSettings {
 
 export interface OfflineMutation {
   id: string;
-  action: 'SAVE_TIFFIN' | 'UPDATE_RENT' | 'UPLOAD_BILL' | 'CREATE_RECEIPT' | 'DEV_UNLOCK';
+  action: 'SAVE_TIFFIN' | 'UPDATE_RENT' | 'UPLOAD_BILL' | 'DEV_UNLOCK';
   payload: any;
   created_at: number;
   status: 'pending' | 'syncing' | 'failed';

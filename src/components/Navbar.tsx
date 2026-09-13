@@ -27,9 +27,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
 
   const navItems = [
     { id: 'tiffins', label: 'Tiffins', icon: UtensilsCrossed, description: 'Daily meals counter' },
-    { id: 'payments', label: 'Payments', icon: CreditCard, description: 'UPI QR & dues' },
     { id: 'bills', label: 'Electricity Bill', icon: Zap, description: 'Upload & view bills' },
     { id: 'rent', label: 'Rent Log', icon: Home, description: 'Monthly rent records' },
+    { id: 'payments', label: 'Payments', icon: CreditCard, description: 'UPI QR & dues' },
   ];
 
   const handleSelectTab = (tabId: string) => {

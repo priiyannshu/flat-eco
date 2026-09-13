@@ -777,80 +777,7 @@ app.post('/api/bills', async (c) => {
 });
 
 // -------------------------------------------------------------
-// 6. Receipts (Row-Level Security Enforced)
-// -------------------------------------------------------------
-app.get('/api/receipts', async (c) => {
-  try {
-    const authRole = c.get('userRole');
-    const authUserId = c.get('userId');
-
-    let query = 'SELECT * FROM receipts';
-    let params: any[] = [];
-
-    // STRICT RLS: Tenants can ONLY access their own issued receipts!
-    if (authRole !== 'owner') {
-      query += ' WHERE user_id = ?';
-      params.push(authUserId);
-    }
-
-    query += ' ORDER BY issued_at DESC';
-    const { results } = await c.env.DB.prepare(query).bind(...params).all();
-    return c.json(results);
-  } catch (err: any) {
-    return c.json({ error: err.message }, 500);
-  }
-});
-
-app.post('/api/receipts', async (c) => {
-  try {
-    const authRole = c.get('userRole');
-    if (authRole !== 'owner') {
-      return c.json({
-        error: 'FORBIDDEN',
-        message: 'Row-Level Security: Only the apartment owner can issue official receipts.'
-      }, 403);
-    }
-
-    const { user_id, month, rent_amount, tiffin_count, tiffin_amount, electricity_amount, extras_amount, total_amount, notes } = await c.req.json();
-    const id = `REC-${month}-${user_id.toUpperCase()}`;
-    const now = Date.now();
-
-    await c.env.DB.prepare(`
-      INSERT INTO receipts (id, user_id, month, rent_amount, tiffin_count, tiffin_amount, electricity_amount, extras_amount, total_amount, status, issued_at, issued_by, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'issued', ?, 'owner', ?)
-      ON CONFLICT(id) DO UPDATE SET
-        rent_amount = excluded.rent_amount,
-        tiffin_count = excluded.tiffin_count,
-        tiffin_amount = excluded.tiffin_amount,
-        electricity_amount = excluded.electricity_amount,
-        extras_amount = excluded.extras_amount,
-        total_amount = excluded.total_amount,
-        issued_at = excluded.issued_at,
-        notes = excluded.notes
-    `).bind(
-      id, user_id, month, rent_amount, tiffin_count, tiffin_amount,
-      electricity_amount, extras_amount || 0, total_amount, now, notes || null
-    ).run();
-
-    const notifId = 'notif_rec_' + now;
-    await c.env.DB.prepare(`
-      INSERT INTO notifications (id, target_user_id, title, message, type, data_json, is_read, created_at)
-      VALUES (?, ?, '📄 Official Receipt Issued', ?, 'receipt', ?, 0, ?)
-    `).bind(
-      notifId, user_id,
-      `Your official FlatEco receipt for ${month} (Total ₹${total_amount}) has been issued. You can view or download the PDF anytime.`,
-      JSON.stringify({ receipt_id: id, month, total_amount }),
-      now
-    ).run();
-
-    return c.json({ success: true, id });
-  } catch (err: any) {
-    return c.json({ error: err.message }, 500);
-  }
-});
-
-// -------------------------------------------------------------
-// 7. Notifications (Row-Level Security Enforced)
+// 6. Notifications (Row-Level Security Enforced)
 // -------------------------------------------------------------
 app.get('/api/notifications', async (c) => {
   try {
@@ -878,7 +805,7 @@ app.post('/api/notifications/:id/read', async (c) => {
 });
 
 // -------------------------------------------------------------
-// 8. Offline Sync Engine (RLS Guarded)
+// 7. Offline Sync Engine (RLS Guarded)
 // -------------------------------------------------------------
 app.post('/api/sync', async (c) => {
   try {

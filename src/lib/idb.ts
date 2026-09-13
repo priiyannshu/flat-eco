@@ -1,7 +1,7 @@
-import { TiffinRecord, RentRecord, ElectricityBill, ReceiptRecord, AppNotification, UserProfile, OfflineMutation } from '../types';
+import { TiffinRecord, RentRecord, ElectricityBill, AppNotification, UserProfile, OfflineMutation } from '../types';
 
 const DB_NAME = 'flat_eco_idb';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export class LocalDB {
   private db: IDBDatabase | null = null;
@@ -14,6 +14,7 @@ export class LocalDB {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        const tx = (event.target as IDBOpenDBRequest).transaction;
 
         if (!db.objectStoreNames.contains('tiffins')) {
           const store = db.createObjectStore('tiffins', { keyPath: 'id' });
@@ -27,9 +28,8 @@ export class LocalDB {
           const store = db.createObjectStore('bills', { keyPath: 'id' });
           store.createIndex('billing_month', 'billing_month', { unique: false });
         }
-        if (!db.objectStoreNames.contains('receipts')) {
-          const store = db.createObjectStore('receipts', { keyPath: 'id' });
-          store.createIndex('user_id', 'user_id', { unique: false });
+        if (db.objectStoreNames.contains('receipts')) {
+          db.deleteObjectStore('receipts');
         }
         if (!db.objectStoreNames.contains('notifications')) {
           const store = db.createObjectStore('notifications', { keyPath: 'id' });
@@ -41,6 +41,18 @@ export class LocalDB {
         if (!db.objectStoreNames.contains('mutations')) {
           const store = db.createObjectStore('mutations', { keyPath: 'id' });
           store.createIndex('status', 'status', { unique: false });
+        }
+
+        // Empty existing fake data stores on upgrade to v2
+        if (event.oldVersion < 2 && tx) {
+          const storesToClear = ['tiffins', 'rent', 'bills', 'notifications', 'mutations'];
+          for (const s of storesToClear) {
+            if (db.objectStoreNames.contains(s)) {
+              try {
+                tx.objectStore(s).clear();
+              } catch {}
+            }
+          }
         }
       };
 
@@ -111,6 +123,25 @@ export class LocalDB {
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);
     });
+  }
+
+  async clearStore(storeName: string): Promise<void> {
+    const db = await this.open();
+    if (!db.objectStoreNames.contains(storeName)) return;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
+      const req = store.clear();
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async clearAllData(): Promise<void> {
+    const stores = ['tiffins', 'rent', 'bills', 'notifications', 'mutations'];
+    for (const s of stores) {
+      await this.clearStore(s);
+    }
   }
 
   // Mutation Queue for Offline Sync

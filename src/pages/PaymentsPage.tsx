@@ -33,8 +33,9 @@ export const PaymentsPage: React.FC = () => {
   const [editingUpi, setEditingUpi] = useState(false);
   const [upiInput, setUpiInput] = useState(ownerUpi);
 
-  const currentMonthStr = new Date().toISOString().substring(0, 7); // YYYY-MM
-  const monthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const now = new Date();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+  const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   const fetchData = async () => {
     setLoading(true);

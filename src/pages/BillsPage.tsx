@@ -17,7 +17,10 @@ export const BillsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   // Upload Form State (Owner)
-  const [billingMonth, setBillingMonth] = useState<string>(new Date().toISOString().substring(0, 7));
+  const [billingMonth, setBillingMonth] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [totalAmount, setTotalAmount] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');

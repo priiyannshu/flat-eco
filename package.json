@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "hono": "^4.7.2",
-    "jspdf": "^2.5.2",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

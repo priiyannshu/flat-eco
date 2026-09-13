@@ -4,7 +4,6 @@ import {
   TiffinRecord,
   RentRecord,
   ElectricityBill,
-  ReceiptRecord,
   AppNotification,
   AppSettings
 } from '../types';
@@ -116,7 +115,7 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, setupPin })
     });
-    const data = await res.json();
+    const data = (await res.json()) as any;
     if (!res.ok) throw new Error(data.error || 'Failed to initialize passkey registration');
     return data;
   }
@@ -127,7 +126,7 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, credential, deviceName })
     });
-    const data = await res.json();
+    const data = (await res.json()) as any;
     if (data.token) {
       this.setSessionToken(data.token);
     }
@@ -140,7 +139,7 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId })
     });
-    const data = await res.json();
+    const data = (await res.json()) as any;
     if (!res.ok) throw new Error(data.error || 'Failed to initialize passkey authentication');
     return data;
   }
@@ -151,7 +150,7 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, assertion, deviceName })
     });
-    const data = await res.json();
+    const data = (await res.json()) as any;
     if (data.token) {
       this.setSessionToken(data.token);
     }
@@ -174,13 +173,13 @@ class ApiClient {
           body: JSON.stringify({ userId, pin, deviceName })
         });
         if (res.ok) {
-          const data = await res.json();
+          const data = (await res.json()) as any;
           if (data.token) {
             this.setSessionToken(data.token);
           }
           return data;
         } else {
-          const err = await res.json();
+          const err = (await res.json()) as any;
           return { success: false, error: err.error || 'Login failed' };
         }
       }
@@ -205,7 +204,15 @@ class ApiClient {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            await localDB.putMany('tiffins', data);
+            if (month) {
+              const existing = await localDB.getAll<TiffinRecord>('tiffins');
+              const toKeep = existing.filter(t => !t.date.startsWith(month));
+              await localDB.clearStore('tiffins');
+              await localDB.putMany('tiffins', [...toKeep, ...data]);
+            } else {
+              await localDB.clearStore('tiffins');
+              await localDB.putMany('tiffins', data);
+            }
             return data;
           }
         }
@@ -235,7 +242,7 @@ class ApiClient {
         });
 
         if (res.status === 403) {
-          const data = await res.json();
+          const data = (await res.json()) as any;
           return { success: false, error: data.message || 'Record locked after 24 hours', isLocked: true };
         }
 
@@ -261,7 +268,15 @@ class ApiClient {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            await localDB.putMany('rent', data);
+            if (month) {
+              const existing = await localDB.getAll<RentRecord>('rent');
+              const toKeep = existing.filter(r => r.month !== month);
+              await localDB.clearStore('rent');
+              await localDB.putMany('rent', [...toKeep, ...data]);
+            } else {
+              await localDB.clearStore('rent');
+              await localDB.putMany('rent', data);
+            }
             return data;
           }
         }
@@ -321,6 +336,7 @@ class ApiClient {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
+            await localDB.clearStore('bills');
             await localDB.putMany('bills', data);
             return data;
           }
@@ -377,61 +393,6 @@ class ApiClient {
     return true;
   }
 
-  // --- Receipts ---
-  async getReceipts(userId?: string): Promise<ReceiptRecord[]> {
-    try {
-      if (navigator.onLine) {
-        const res = await fetch('/api/receipts', { headers: this.getHeaders(userId) });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            await localDB.putMany('receipts', data);
-            return data;
-          }
-        }
-      }
-    } catch {
-      // offline
-    }
-
-    let all = await localDB.getAll<ReceiptRecord>('receipts');
-    if (userId && userId !== 'owner') {
-      all = all.filter(r => r.user_id === userId);
-    }
-    return all.sort((a, b) => b.issued_at - a.issued_at);
-  }
-
-  async issueReceipt(receipt: ReceiptRecord, currentUserId: string): Promise<boolean> {
-    await localDB.put('receipts', receipt);
-
-    // Create notification locally
-    await localDB.put('notifications', {
-      id: 'notif_rec_' + Date.now(),
-      target_user_id: receipt.user_id,
-      title: '📄 Official Receipt Issued',
-      message: `Receipt for ${receipt.month} (Total ₹${receipt.total_amount}) has been issued.`,
-      type: 'receipt',
-      is_read: 0,
-      created_at: Date.now()
-    });
-
-    if (navigator.onLine) {
-      try {
-        const res = await fetch('/api/receipts', {
-          method: 'POST',
-          headers: this.getHeaders(currentUserId),
-          body: JSON.stringify(receipt)
-        });
-        if (res.ok) return true;
-      } catch {
-        // queue
-      }
-    }
-
-    await localDB.addMutation('CREATE_RECEIPT', receipt);
-    return true;
-  }
-
   // --- Notifications ---
   async getNotifications(userId: string): Promise<AppNotification[]> {
     try {
@@ -440,6 +401,7 @@ class ApiClient {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
+            await localDB.clearStore('notifications');
             await localDB.putMany('notifications', data);
             return data;
           }
@@ -478,7 +440,7 @@ class ApiClient {
           headers: this.getHeaders(),
           body: JSON.stringify({ passkey, recordId })
         });
-        const data = await res.json();
+        const data = (await res.json()) as any;
         return data;
       }
     } catch {
@@ -513,7 +475,7 @@ class ApiClient {
       });
 
       if (res.ok) {
-        const data = await res.json();
+        const data = (await res.json()) as any;
         for (const item of (data.processed || [])) {
           if (item.status === 'synced' || item.status === 'locked') {
             await localDB.removeMutation(item.id);

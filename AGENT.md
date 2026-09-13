@@ -10,7 +10,6 @@ A lightweight reference for AI agents and developers working on the FlatEco code
 - **Backend API**: Cloudflare Workers, Hono v4
 - **Database**: Cloudflare D1 (Edge SQLite)
 - **Client Offline Storage**: IndexedDB (custom wrapper in `src/lib/idb.ts`), Service Worker (`public/sw.js`)
-- **PDF Generation**: jsPDF
 - **CLI Tools**: `npm`, `vite`, `wrangler` (Cloudflare CLI), `gh` (GitHub CLI), `git`
 
 ---
@@ -21,7 +20,7 @@ A lightweight reference for AI agents and developers working on the FlatEco code
 ├── src/
 │   ├── components/      # UI components (Navbar, LoginScreen, etc.)
 │   ├── context/         # AuthContext, SyncContext
-│   ├── lib/             # API client, IndexedDB store, PDF generator
+│   ├── lib/             # API client, IndexedDB store, WebAuthn passkeys
 │   ├── pages/           # TiffinsPage, PaymentsPage, BillsPage, RentPage
 │   └── types/           # Core TypeScript definitions
 ├── worker/

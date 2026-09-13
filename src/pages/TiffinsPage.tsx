@@ -19,16 +19,29 @@ import {
 const TIFFIN_PRICE = 60;
 const LOCK_HOURS = 24;
 
+const getLocalDateString = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getLocalMonthString = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
 export const TiffinsPage: React.FC = () => {
   const { currentUser, allUsers } = useAuth();
   const isOwner = currentUser?.role === 'owner';
 
   // Selected month for viewing (YYYY-MM)
-  const currentMonthInitial = new Date().toISOString().substring(0, 7);
+  const currentMonthInitial = getLocalMonthString();
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthInitial);
 
   // Date selection for owner counter
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalDateString();
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [selectedMeal, setSelectedMeal] = useState<MealType>('lunch');
 
@@ -56,7 +69,7 @@ export const TiffinsPage: React.FC = () => {
   const changeMonth = (delta: number) => {
     const [y, m] = selectedMonth.split('-').map(Number);
     const d = new Date(y, m - 1 + delta, 1);
-    setSelectedMonth(d.toISOString().substring(0, 7));
+    setSelectedMonth(getLocalMonthString(d));
   };
 
   // --- TENANT VIEW COMPUTATIONS ---
@@ -127,12 +140,13 @@ export const TiffinsPage: React.FC = () => {
   }, [allUsers]);
 
   const changeDate = (days: number) => {
-    const d = new Date(selectedDate);
-    d.setDate(d.getDate() + days);
-    const newDateStr = d.toISOString().split('T')[0];
+    const [y, m, d] = selectedDate.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d + days);
+    const newDateStr = getLocalDateString(dateObj);
     setSelectedDate(newDateStr);
-    if (newDateStr.substring(0, 7) !== selectedMonth) {
-      setSelectedMonth(newDateStr.substring(0, 7));
+    const newMonth = getLocalMonthString(dateObj);
+    if (newMonth !== selectedMonth) {
+      setSelectedMonth(newMonth);
     }
   };
 
@@ -189,7 +203,8 @@ export const TiffinsPage: React.FC = () => {
   // 1. TENANT VIEW: TABLE OF MARKED TIFFINS
   // ==========================================
   if (!isOwner) {
-    const monthTitle = new Date(selectedMonth + '-01').toLocaleDateString('en-US', {
+    const [yStr, mStr] = selectedMonth.split('-');
+    const monthTitle = new Date(Number(yStr), Number(mStr) - 1, 1).toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric'
     });

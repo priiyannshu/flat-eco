@@ -56,29 +56,12 @@ CREATE TABLE IF NOT EXISTS electricity_bills (
   created_at INTEGER NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS receipts (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  month TEXT NOT NULL,         -- Format: YYYY-MM
-  rent_amount REAL NOT NULL,
-  tiffin_count INTEGER NOT NULL,
-  tiffin_amount REAL NOT NULL,
-  electricity_amount REAL NOT NULL,
-  extras_amount REAL NOT NULL DEFAULT 0,
-  total_amount REAL NOT NULL,
-  status TEXT NOT NULL DEFAULT 'issued',
-  issued_at INTEGER NOT NULL,
-  issued_by TEXT DEFAULT 'owner',
-  notes TEXT,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
 CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   target_user_id TEXT NOT NULL, -- 'all' or specific user_id
   title TEXT NOT NULL,
   message TEXT NOT NULL,
-  type TEXT NOT NULL,          -- 'bill', 'receipt', 'rent', 'lock', 'system'
+  type TEXT NOT NULL,          -- 'bill', 'rent', 'lock', 'system'
   data_json TEXT,
   is_read INTEGER DEFAULT 0,
   created_at INTEGER NOT NULL
@@ -136,7 +119,6 @@ INSERT OR IGNORE INTO app_settings (key, value) VALUES
 CREATE INDEX IF NOT EXISTS idx_tiffin_date ON tiffin_records(date);
 CREATE INDEX IF NOT EXISTS idx_rent_user_month ON rent_records(user_id, month);
 CREATE INDEX IF NOT EXISTS idx_bills_month ON electricity_bills(billing_month);
-CREATE INDEX IF NOT EXISTS idx_receipts_user ON receipts(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_target ON notifications(target_user_id);
 CREATE INDEX IF NOT EXISTS idx_passkeys_user ON user_passkeys(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON user_sessions(user_id);

@@ -24,9 +24,9 @@ const AppContent: React.FC = () => {
 
       <main className="flex-1 pb-12">
         {currentTab === 'tiffins' && <TiffinsPage />}
-        {currentTab === 'payments' && <PaymentsPage />}
         {currentTab === 'bills' && <BillsPage />}
         {currentTab === 'rent' && <RentPage />}
+        {currentTab === 'payments' && <PaymentsPage />}
       </main>
     </div>
   );

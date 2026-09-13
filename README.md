@@ -25,7 +25,6 @@ FlatEco comes pre-seeded with 5 profiles (switchable via the profile picker at t
    - Master ledger view of all 4 roommates + Extras.
    - Ability to tick rent as Paid/Pending for any tenant and record payment mode (UPI, Cash, Bank Transfer).
    - Ability to upload monthly electricity bills with attached photo receipts.
-   - Ability to issue and transmit official receipts in-app to any tenant.
 2. **Priyanshu (`tenant_1`)**: Private ledger, rent status, personal tiffin breakdown.
 3. **Sushil (`tenant_2`)**: Private ledger, rent status, personal tiffin breakdown.
 4. **Varsh (`tenant_3`)**: Private ledger, rent status, personal tiffin breakdown.
@@ -65,13 +64,7 @@ FlatEco comes pre-seeded with 5 profiles (switchable via the profile picker at t
 - **Owner View**: Consolidated breakdown of all roommates (Tiffins count & cost, Rent status, Power share, Net dues, Flat total pool).
 - **Tenant View**: Private itemized statement with clear individual totals for the month.
 
-### 5. In-App Receipts & Vector PDF Export
-- Owner can click **"Send Receipt"** for any tenant and month.
-- An official receipt record is created, and the tenant receives an in-app notification.
-- Built-in PDF generator creates clean, official A5 receipts with flat header, itemized breakdown, total calculation, and verified digital stamp.
-- Can be saved or printed on any mobile or desktop device.
-
-### 6. Offline-First & Auto-Sync
+### 5. Offline-First & Auto-Sync
 - Powered by **IndexedDB (`idb.ts`)** and **Service Worker (`sw.js`)**.
 - Ticks and updates recorded while offline are queued with a `pending` status.
 - Once internet returns (or when the app opens), the queue flushes automatically to Cloudflare D1.
